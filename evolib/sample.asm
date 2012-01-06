@@ -1,5 +1,3 @@
-
-
 	INCLUDE "text_h.asm"
 	INCLUDE "samp_h.asm"
 
@@ -671,4 +669,4 @@ dir		DIR
 rfatfs		FATFS
 help
 .win		txt.WIN 1,24,77,1,0,0,0x30
-.str		byte "Tab-Panel 1-About 2-ChDrv 5-Copy 6-Rename 7-MkDir 8-Delete",0 
+.str		byte "Tab-Panel 1-About 2-ChDrv 5-Copy 6-Rename 7-MkDir 8-Delete",0 
