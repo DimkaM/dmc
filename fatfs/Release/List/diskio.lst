@@ -1,0 +1,60 @@
+##############################################################################
+#                                                                            #
+# IAR Z80/64180 C-Compiler V4.06A/WIN                                        #
+#                                                                            #
+#       Compile time  =  15/Nov/2011  18:38:39                               #
+#       Target option =  Z80                                                 #
+#       Memory model  =  large                                               #
+#       Source file   =  c:\users\dimkam\documents\projects\fatfs\diskio.c   #
+#       List file     =  c:\users\dimkam\documents\projects\fatfs\release\list\diskio.lst#
+#       Object file   =  c:\users\dimkam\documents\projects\fatfs\release\obj\diskio.r01#
+#       ASM file      =  c:\users\dimkam\documents\projects\fatfs\release\list\diskio.s01#
+#       Command line  =  -v0 -ml -uua                                        #
+#                        -OC:\Users\DimkaM\Documents\projects\fatfs\Release\Obj\ #
+#                        -e -c -K -gA -z9 -RCODE                             #
+#                        -LC:\Users\DimkaM\Documents\projects\fatfs\Release\List\ #
+#                        -q -T -t8                                           #
+#                        -AC:\Users\DimkaM\Documents\projects\fatfs\Release\List\ #
+#                        -NC:\Users\DimkaM\Documents\projects\fatfs\Release\List\ #
+#                        -X -IC:\Program Files\IAR ewz80\z80\inc\            #
+#                        C:\Users\DimkaM\Documents\projects\fatfs\diskio.c   #
+#                                                                            #
+#                           Copyright 2001 IAR Systems. All rights reserved. #
+##############################################################################
+
+
+}
+^
+"c:\users\dimkam\documents\projects\fatfs\diskio.c",8  Warning[33]: Local or formal 'c' was never referenced
+"c:\users\dimkam\documents\projects\fatfs\diskio.c",8  Warning[33]: Local or formal 'b' was never referenced
+"c:\users\dimkam\documents\projects\fatfs\diskio.c",8  Warning[33]: Local or formal 'a' was never referenced
+   \   0000                    NAME    diskio(16)
+   \   0000                    RSEG    CODE(0)
+   \   0000                    PUBLIC  disk_ioctl
+   \   0000                    EXTERN  ?CLZ80L_4_06_L00
+   \   0000                    EXTERN  ?ENT_PARM_DIRECT_L09
+   \   0000                    EXTERN  ?LEAVE_DIRECT_L09
+   \   0000                    RSEG    CODE
+      1          #include "diskio.h"             /* Declarations of low level disk I/O functions */
+      2          #include "ff.h" 
+      3          #include "ffconf.h"
+      4          
+      5          DRESULT disk_ioctl (BYTE a, BYTE b, void* c)
+   \   0000            disk_ioctl:
+   \   0000  C5                PUSH    BC
+   \   0001  D5                PUSH    DE
+      6          {
+   \   0002  AF                XOR     A
+      7            return (0);
+   \   0003  E1                POP     HL
+   \   0004  E1                POP     HL
+   \   0005  C9                RET
+      8          }
+   \   0006                    END
+
+Errors: none
+Warnings: 3
+Code size: 6
+Constant size: 0
+Static variable size: Data(0) Iram(0)
+

@@ -1,0 +1,1013 @@
+###############################################################################
+#                                                                             #
+#     IAR Systems Z80/64180 Assembler V4.06A/WIN 15/Nov/2011  18:38:43        #
+#     Copyright 2001 IAR Systems. All rights reserved.                        #
+#                                                                             #
+#           Target option =  z80                                              #
+#           Source file   =  C:\Users\DimkaM\Documents\projects\fatfs\savelij.asm#
+#           List file     =  C:\Users\DimkaM\Documents\projects\fatfs\Release\List\savelij.lst#
+#           Object file   =  C:\Users\DimkaM\Documents\projects\fatfs\Release\Obj\savelij.r01#
+#           Command line  =  -v0 -uu                                          #
+#                            -OC:\Users\DimkaM\Documents\projects\fatfs\Release\Obj\ #
+#                            -s+ -M<> -w+                                     #
+#                            -LC:\Users\DimkaM\Documents\projects\fatfs\Release\List\ #
+#                            -T -t8 -IC:\Program Files\IAR ewz80\z80\inc\     #
+#                            C:\Users\DimkaM\Documents\projects\fatfs\savelij.asm #
+#                                                                             #
+###############################################################################
+
+      1    000000          MODULE SAVELIJ  ;15950
+      2    000000            PUBLIC disk_initialize
+      3    000000            PUBLIC disk_read
+      4    000000            PUBLIC disk_write
+      5    000000            PUBLIC ds_m
+      6    000000            PUBLIC FatFs
+      7    000000            PUBLIC Fsid
+      8    000000            PUBLIC CurrVol
+      9    000000            PUBLIC dio_par
+     10    000000            EXTERN f_mount
+     11    000000            EXTERN f_open
+     12    000000            EXTERN f_mkdir
+     13    000000            
+     14    000000            RSEG NEAR_Z
+     15    000000          
+     16    000000            RSEG CODE
+     17    000000          
+     18    000000          dio_par:
+     19    000000 01               DEFB 1        ;DRV
+     20    000001 0040             DEFW 0x4000   ;*BUF
+     21    000003 0000             DEFW 0        ;*sec
+     22    000005 20               DEFB 32       ;NUM
+     23    000006          CurrVol:
+     24    000006 00               DEFB 0
+     25    000007          FatFs:
+     26    000007 00000000         DEFW 0,0
+     27    00000B          Fsid:
+     28    00000B 0000             DEFW 0
+     29    00000D          ds_m:
+     30    00000D 01010101         DEFB 1,1,1,1
+     31    000011                  
+     32    000011          disk_initialize:
+     33    000011 1600             ld d,0
+     34    000013 21....           ld hl,ds_m
+     35    000016 19               add hl,de
+     36    000017 7E               ld a,(hl)
+     37    000018 B7               or a
+     38    000019 C8               ret z
+     39    00001A 60               ld h,b
+     40    00001B 69               ld l,c
+     41    00001C 7B               LD A,e
+     42    00001D B7               or a
+     43    00001E 2007             jr nz,di_l1
+     44    000020 CD....           call zsd_init
+     45    000023 32....           ld (ds_m),a
+     46    000026 C9               ret
+     47    000027 3D       di_l1   dec a
+     48    000028 2009             jr nz,di_l2
+     49    00002A 3EE0             ld a,0xe0
+     50    00002C CD....           call nemo_init
+     51    00002F 32....           ld (ds_m+1),a
+     52    000032 C9               ret
+     53    000033 3D       di_l2   dec a
+     54    000034 2009             jr nz,di_l3
+     55    000036 3EF0             ld a,0xf0
+     56    000038 CD....           call nemo_init
+     57    00003B 32....           ld (ds_m+2),a
+     58    00003E C9               ret
+     59    00003F 3D       di_l3   dec a
+     60    000040 2007             jr nz,di_l4
+     61    000042 CD....           call GSDINIT
+     62    000045 32....           ld (ds_m+3),a
+     63    000048 C9               ret
+     64    000049 3E01     di_l4   ld a,1
+     65    00004B C9               ret
+     66    00004C          
+     67    00004C                  
+     68    00004C          get_params
+     69    00004C 2A....           ld hl,(dio_par+3)
+     70    00004F 5E               ld e,(hl)
+     71    000050 23               inc hl
+     72    000051 56               ld d,(hl)
+     73    000052 23               inc hl
+     74    000053 4E               ld c,(hl)
+     75    000054 23               inc hl
+     76    000055 46               ld b,(hl)
+     77    000056 2A....           ld hl,(dio_par+1)
+     78    000059 3A....           ld a,(dio_par+5)
+     79    00005C 08               ex af,af
+     80    00005D 3A....           ld a,(dio_par)
+     81    000060 B7               or a
+     82    000061 C9               ret
+     83    000062                  
+     84    000062          disk_read:
+     85    000062 CD....           call get_params
+     86    000065 CA....           jp z,zsd_read
+     87    000068 3D               dec a
+     88    000069 2005             jr nz,disk_read_nomaster
+     89    00006B 3EE0             ld a,$e0
+     90    00006D C3....           jp nemo_read
+     91    000070          disk_read_nomaster
+     92    000070 3D               dec a
+     93    000071 2005             jr nz,disk_read_nonemo
+     94    000073 3EF0             ld a,$f0
+     95    000075 C3....           jp nemo_read
+     96    000078          disk_read_nonemo
+     97    000078 3D               dec a
+     98    000079 CA....           jp z,SDRDMUL
+     99    00007C 3E01             ld a,1
+    100    00007E C9               ret
+    101    00007F                  
+    102    00007F          disk_write:
+    103    00007F CD....           call get_params
+    104    000082 CA....           jp z,zsd_write
+    105    000085 3D               dec a
+    106    000086 2005             jr nz,disk_write_nomaster
+    107    000088 3EE0             ld a,$e0
+    108    00008A C3....           jp nemo_write
+    109    00008D          disk_write_nomaster
+    110    00008D 3D               dec a
+    111    00008E 2005             jr nz,disk_write_nonemo
+    112    000090 3EF0             ld a,$f0
+    113    000092 C3....           jp nemo_write
+    114    000095          disk_write_nonemo
+    115    000095 3D               dec a
+    116    000096 CA....           jp z,SDWRMUL
+    117    000099 3E01             ld a,1
+    118    00009B C9               ret
+    119    00009C          ;Входные параметры общие:
+    120    00009C          ;HL-адрес загрузки в память
+    121    00009C          ;BCDE-32-х битный номер сектора
+    122    00009C          ;A-количество блоков (блок=512 байт)
+    123    00009C          ;только для многоблочной записи/чтении
+    124    00009C          
+    125    0000F0          P_1F7   EQU 0xF0                        ;РЕГИСТР
+                            СОСТОЯНИЯ/РЕГИСТР КОМАНД
+    126    0000D0          P_1F6   EQU 0xD0                        ;CHS-НОМЕР
+                            ГОЛОВЫ И УСТР/LBA АДРЕС 24-27
+    127    0000B0          P_1F5   EQU 0xB0                        ;CHS-ЦИЛИНДР
+                            8-15/LBA АДРЕС 16-23
+    128    000090          P_1F4   EQU 0x90                        ;CHS-ЦИЛИНДР
+                            0-7/LBA АДРЕС 8-15
+    129    000070          P_1F3   EQU 0x70                        ;CHS-НОМЕР
+                            СЕКТОРА/LBA АДРЕС 0-7
+    130    000050          P_1F2   EQU 0x50                        ;СЧЕТЧИК
+                            СЕКТОРОВ
+    131    000030          P_1F1   EQU 0x30                        ;ПОРТ
+                            ОШИБОК/СВОЙСТВ
+    132    000010          P_1F0   EQU 0x10                        ;ПОРТ
+                            ДАННЫХ
+    133    0000C8          P_3F6   EQU 0xC8                        ;РЕГИСТР
+                            СОСТОЯНИЯ/УПРАВЛЕНИЯ
+    134    000011          P_HI    EQU 0x11                        ;СТАРШИЕ 8
+                            БИТ
+    135    001011          PRT_RW  EQU P_1F0*256+P_HI      ;ПОРТЫ ЧТЕНИЯ/ЗАПИСИ
+                            ОДНИМ СЛОВОМ
+    136    00009C          
+    137    00009C          ;НА ВЫХОДЕ:
+    138    00009C          ;H-ДЛЯ MASTER 0-HDD, 1-CDROM, 0xFF-NONE
+    139    00009C          ;L-ДЛЯ SLAVE  0-HDD, 1-CDROM, 0xFF-NONE
+    140    00009C          nemo_init:
+    141    00009C E5                       PUSH HL
+    142    00009D CD....                   CALL ID_DEV
+    143    0000A0 E1                       POP HL
+    144    0000A1 A7                       AND A
+    145    0000A2 CC....                   CALL Z,INIT_91
+    146    0000A5          nemo_off:
+    147    0000A5 C9                       RET
+    148    0000A6          
+    149    0000A6          INIT_91:
+    150    0000A6 E5                       PUSH HL
+    151    0000A7 54                       ld d,h
+    152    0000A8 5D                       ld e,l
+    153    0000A9 216300                   LD hl,49*2+1
+    154    0000AC 19                       add hl,de
+    155    0000AD 7E                       LD A,(HL)
+    156    0000AE E602                     AND 2
+    157    0000B0 282A                     JR Z,INI_912
+    158    0000B2 0150FF                   LD BC,0xFF00+P_1F2
+    159    0000B5 210C00                   LD hl,0x0C
+    160    0000B8 19                       add hl,de
+    161    0000B9 7E                       LD A,(HL)
+    162    0000BA ED79                     OUT (C),A
+    163    0000BC 210600                   LD hl,6
+    164    0000BF 0ED0                     LD C,P_1F6
+    165    0000C1 19                       add hl,de
+    166    0000C2 7E                       LD A,(HL)
+    167    0000C3 3D                       DEC A
+    168    0000C4 ED79                     OUT (C),A
+    169    0000C6 0EF0                     LD C,P_1F7
+    170    0000C8 3E91                     LD A,0x91
+    171    0000CA ED79                     OUT (C),A
+    172    0000CC 110010                   LD DE,0x1000
+    173    0000CF          INI_911:
+    174    0000CF 1B                       DEC DE
+    175    0000D0 7A                       LD A,D
+    176    0000D1 B3                       OR E
+    177    0000D2 2808                     JR Z,INI_912
+    178    0000D4 ED78                     IN A,(C)
+    179    0000D6 E680                     AND 0x80
+    180    0000D8 20F5                     JR NZ,INI_911
+    181    0000DA E1                       POP HL
+    182    0000DB C9                       RET
+    183    0000DC          
+    184    0000DC          INI_912:
+    185    0000DC 3EFF                     LD A,0xFF
+    186    0000DE E1                       POP HL
+    187    0000DF C9                       RET
+    188    0000E0          
+    189    0000E0          ;READ "A" SECTORS HDD
+    190    0000E0          nemo_read:        
+    191    0000E0 80                       add a,b
+    192    0000E1 47                       ld b,a
+    193    0000E2 CD....                   CALL SETHREG
+    194    0000E5 08                       EX AF,AF
+    195    0000E6 0EF0                     LD C,0xf0
+    196    0000E8 3E20                     LD A,0x20
+    197    0000EA ED79                     OUT (C),A
+    198    0000EC 0EF0                     LD C,0xf0
+    199    0000EE          HDDRD1:
+    200    0000EE ED78                     IN A,(C)
+    201    0000F0 E688                     AND 0x88
+    202    0000F2 FE08                     CP 8
+    203    0000F4 20F8                     JR NZ,HDDRD1
+    204    0000F6 08                       EX AF,AF
+    205    0000F7          HDDRD2:
+    206    0000F7 08                       EX AF,AF
+    207    0000F8 CD....                   CALL READSEC
+    208    0000FB 0EF0                     LD C,0xf0
+    209    0000FD          HDDRD3: 
+    210    0000FD ED78                     IN A,(C)
+    211    0000FF E680                     AND 0x80
+    212    000101 20FA                     JR NZ,HDDRD3
+    213    000103 08                       EX AF,AF
+    214    000104 3D                       DEC A
+    215    000105 20F0                     JR NZ,HDDRD2
+    216    000107 1829                     JR EXITNHD
+    217    000109          
+    218    000109          ;WRITE "A" SECTORS HDD
+    219    000109          nemo_write:
+    220    000109 80                       add a,b
+    221    00010A 47                       ld b,a
+    222    00010B CD....                   CALL SETHREG
+    223    00010E 08                       EX AF,AF
+    224    00010F 0EF0                     LD C,P_1F7
+    225    000111 3E30                     LD A,0x30
+    226    000113 ED79                     OUT (C),A
+    227    000115 0EF0                     LD C,P_1F7
+    228    000117          HDDWR1: 
+    229    000117 ED78                     IN A,(C)
+    230    000119 E688                     AND 0x88
+    231    00011B FE08                     CP 8
+    232    00011D 20F8                     JR NZ,HDDWR1
+    233    00011F 08                       EX AF,AF
+    234    000120          HDDWR2: 
+    235    000120                          
+    236    000120 08                       EX AF,AF
+    237    000121 CD....                   CALL WRITSEC
+    238    000124 24                       inc h
+    239    000125 24                       inc h
+    240    000126 0EF0                     LD C,P_1F7
+    241    000128          HDDWR3: 
+    242    000128 ED78                     IN A,(C)
+    243    00012A E680                     AND 0x80
+    244    00012C 20FA                     JR NZ,HDDWR3
+    245    00012E 08                       EX AF,AF
+    246    00012F 3D                       DEC A
+    247    000130 20EE                     JR NZ,HDDWR2
+    248    000132          EXITNHD:
+    249    000132 3E00                     ld a,0
+    250    000134 C9                       RET
+    251    000135          
+    252    000135          ;READ SECTOR (512 BYTES)
+    253    000135          READSEC:
+    254    000135 3E40                     LD A,0x40
+    255    000137 0E10                     LD C,P_1F0      ;HI
+    256    000139          READSC1:
+    257    000139 ED58                     IN E,(C)
+    258    00013B 0C                       INC C
+    259    00013C ED50                     IN D,(C)
+    260    00013E 0D                       DEC C
+    261    00013F 73                       LD (HL),E
+    262    000140 23                       INC HL
+    263    000141 72                       LD (HL),D
+    264    000142 23                       INC HL
+    265    000143 ED58                     IN E,(C)
+    266    000145 0C                       INC C
+    267    000146 ED50                     IN D,(C)
+    268    000148 0D                       DEC C
+    269    000149 73                       LD (HL),E
+    270    00014A 23                       INC HL
+    271    00014B 72                       LD (HL),D
+    272    00014C 23                       INC HL
+    273    00014D ED58                     IN E,(C)
+    274    00014F 0C                       INC C
+    275    000150 ED50                     IN D,(C)
+    276    000152 0D                       DEC C
+    277    000153 73                       LD (HL),E
+    278    000154 23                       INC HL
+    279    000155 72                       LD (HL),D
+    280    000156 23                       INC HL
+    281    000157 ED58                     IN E,(C)
+    282    000159 0C                       INC C
+    283    00015A ED50                     IN D,(C)
+    284    00015C 0D                       DEC C
+    285    00015D 73                       LD (HL),E
+    286    00015E 23                       INC HL
+    287    00015F 72                       LD (HL),D
+    288    000160 23                       INC HL
+    289    000161 3D                       DEC A
+    290    000162 20D5                     JR NZ,READSC1
+    291    000164 C9                       RET
+    292    000165          
+    293    000165          ;SAVE SECTOR (512 BYTES)
+    294    000165          WRITSEC:
+    295    000165 E5                       PUSH HL
+    296    000166 ED73....                 LD (WR_SEC_SP+1),SP
+    297    00016A F9                       LD SP,HL
+    298    00016B 3E40                     LD A,0x40
+    299    00016D 211110                   LD HL,PRT_RW
+    300    000170          WR_SEC1:
+    301    000170 D1                       POP DE
+    302    000171 4D                       LD C,L
+    303    000172 ED51                     OUT (C),D
+    304    000174 4C                       LD C,H
+    305    000175 ED59                     OUT (C),E
+    306    000177 D1                       POP DE
+    307    000178 4D                       LD C,L
+    308    000179 ED51                     OUT (C),D
+    309    00017B 4C                       LD C,H
+    310    00017C ED59                     OUT (C),E
+    311    00017E D1                       POP DE
+    312    00017F 4D                       LD C,L
+    313    000180 ED51                     OUT (C),D
+    314    000182 4C                       LD C,H
+    315    000183 ED59                     OUT (C),E
+    316    000185 D1                       POP DE
+    317    000186 4D                       LD C,L
+    318    000187 ED51                     OUT (C),D
+    319    000189 4C                       LD C,H
+    320    00018A ED59                     OUT (C),E
+    321    00018C 3D                       DEC A
+    322    00018D 20E1                     JR NZ,WR_SEC1
+    323    00018F 310000   WR_SEC_SP       LD SP,0
+    324    000192 E1                       POP HL
+    325    000193 C9                       RET
+    326    000194          
+    327    000194          ;SET HDD PORTS
+    328    000194          SETHREG:
+    329    000194 D5                       PUSH DE
+    330    000195 50                       LD D,B
+    331    000196 59                       LD E,C
+    332    000197 01D0FF                   LD BC,0xffd0
+    333    00019A ED51                     OUT (C),D
+    334    00019C 0EF0                     LD C,0xf0
+    335    00019E          SETHRE1:
+    336    00019E ED78                     IN A,(C)
+    337    0001A0 E680                     AND 0x80
+    338    0001A2 20FA                     JR NZ,SETHRE1
+    339    0001A4 0EB0                     LD C,0xb0
+    340    0001A6 ED59                     OUT (C),E
+    341    0001A8 D1                       POP DE
+    342    0001A9 0E90                     LD C,0x90
+    343    0001AB ED51                     OUT (C),D
+    344    0001AD 0E70                     LD C,0x70
+    345    0001AF ED59                     OUT (C),E
+    346    0001B1 0E50                     LD C,0x50
+    347    0001B3 08                       EX AF,AF
+    348    0001B4 ED79                     OUT (C),A
+    349    0001B6 C9                       RET
+    350    0001B7          
+    351    0001B7          ;HL-АДРЕС БУФЕРА СЕКТОРА ИДЕНТИФИКАЦИИ
+    352    0001B7          ;A=E0-ДЛЯ MASTER, A=F0-ДЛЯ SLAVE
+    353    0001B7          ID_DEV:
+    354    0001B7 01D0FF                   LD BC,0xFF00+P_1F6
+    355    0001BA ED79                     OUT (C),A
+    356    0001BC 0EF0                     LD C,P_1F7
+    357    0001BE 161A                     LD D,26
+    358    0001C0          ID_DEV3:
+    359    0001C0 FB                       ei
+    360    0001C1 76                       HALT
+    361    0001C2 F3                       di
+    362    0001C3 15                       DEC D
+    363    0001C4 2845                     JR Z,NO_DEV
+    364    0001C6 ED78                     IN A,(C)
+    365    0001C8 CB7F                     BIT 7,A
+    366    0001CA 20F4                     JR NZ,ID_DEV3
+    367    0001CC A7                       AND A
+    368    0001CD 283C                     JR Z,NO_DEV
+    369    0001CF 3C                       INC A
+    370    0001D0 2839                     JR Z,NO_DEV
+    371    0001D2 AF                       XOR A
+    372    0001D3 0EB0                     LD C,P_1F5
+    373    0001D5 ED79                     OUT (C),A
+    374    0001D7 0E90                     LD C,P_1F4
+    375    0001D9 ED79                     OUT (C),A
+    376    0001DB 3EEC                     LD A,0xEC
+    377    0001DD 0EF0                     LD C,P_1F7
+    378    0001DF ED79                     OUT (C),A
+    379    0001E1 0EF0                     LD C,P_1F7
+    380    0001E3          ID_DEV1:
+    381    0001E3 ED78                     IN A,(C)
+    382    0001E5 A7                       AND A
+    383    0001E6 2823                     JR Z,NO_DEV
+    384    0001E8 3C                       INC A
+    385    0001E9 2820                     JR Z,NO_DEV
+    386    0001EB 3D                       DEC A
+    387    0001EC 0F                       RRCA
+    388    0001ED 3807                     JR C,ID_DEV2
+    389    0001EF 07                       RLCA
+    390    0001F0 E688                     AND 0x88
+    391    0001F2 FE08                     CP 8
+    392    0001F4 20ED                     JR NZ,ID_DEV1
+    393    0001F6          ID_DEV2:
+    394    0001F6 0E90                     LD C,P_1F4
+    395    0001F8 ED58                     IN E,(C)
+    396    0001FA 0EB0                     LD C,P_1F5
+    397    0001FC ED50                     IN D,(C)
+    398    0001FE 7A                       LD A,D
+    399    0001FF B3                       OR E
+    400    000200 CA....                   JP Z,READSEC
+    401    000203 2114EB                   LD HL,0xEB14
+    402    000206 ED52                     SBC HL,DE
+    403    000208 3E01                     LD A,1
+    404    00020A C8                       RET Z
+    405    00020B          NO_DEV:
+    406    00020B 3EFF                     LD A,0xFF
+    407    00020D C9                       RET
+    408    00020E          
+    409    00020E          
+    410    00020E          ;Драйвер SD карты
+    411    00020E          ;LAST UPDATE 14.04.2009 savelij
+    412    00020E          ;Входные параметры общие:
+    413    00020E          ;HL-адрес загрузки в память
+    414    00020E          ;BCDE-32-х битный номер сектора
+    415    00020E          ;A-количество блоков (блок=512 байт) - только для
+                            многоблочной записи/чтения
+    416    00020E          ;Ошибки выдаваемые на выходе:
+    417    00020E          ;A=0 - инициализация прошла успешно
+    418    00020E          ;A=1 - карта не найдена или не ответила
+    419    00020E          ;A=2 - карта защищена от записи
+    420    00020E          ;A=3 - попытка записи в сектор 0 карты
+    421    000057          P_DATA    EQU 0x57    ;порт данных
+    422    000077          P_CONF    EQU 0x77    ;порт конфигурации
+    423    00004C          CMD_12    EQU 0x4C    ;STOP_TRANSMISSION
+    424    000051          CMD_17    EQU 0x51    ;READ_SINGLE_BLOCK
+    425    000052          CMD_18    EQU 0x52    ;READ_MULTIPLE_BLOCK
+    426    000058          CMD_24    EQU 0x58    ;WRITE_BLOCK
+    427    000059          CMD_25    EQU 0x59    ;WRITE_MULTIPLE_BLOCK
+    428    000077          CMD_55    EQU 0x77    ;APP_CMD
+    429    00007A          CMD_58    EQU 0x7A    ;READ_OCR
+    430    00007B          CMD_59    EQU 0x7B    ;CRC_ON_OFF
+    431    000069          ACMD_41   EQU 0x69   ;SD_SEND_OP_COND
+    432    00020E          
+    433    00020E          zsd_init
+    434    00020E CD....       CALL CS_HIGH    ;включаем питание карты при
+                                                снятом выборе
+    435    000211 015700       LD BC,P_DATA
+    436    000214 11FF20       LD DE,0x20FF    ;бит выбора карты в <1>
+    437    000217          SD_INITloop
+    438    000217 ED59         OUT (C),E    ;записываем в порт много единичек
+    439    000219 15           DEC D    ;количество единичек несколько
+                                         больше
+    440    00021A 20FB         JR NZ,SD_INITloop    ;чем надо
+    441    00021C AF           XOR A    ;запускаем счетчик на 256
+    442    00021D 08           EX AF,AF    ;для ожидания инициализации
+                                            карты
+    443    00021E          ZAW001    
+    444    00021E 21....       LD HL,CMD00    ;даем команду сброса
+    445    000221 CD....       CALL OUTCOM    ;этой командой карточка
+                                               переводится в режим SPI
+    446    000224 CD....       CALL IN_OOUT    ;читаем ответ карты
+    447    000227 08           EX AF,AF
+    448    000228 3D           DEC A
+    449    000229 2866         JR Z,ZAW003    ;если карта 256 раз не ответила,
+                                               то карты нет
+    450    00022B 08           EX AF,AF
+    451    00022C 3D           DEC A
+    452    00022D 20EF         JR NZ,ZAW001    ;ответ карты <1>, перевод в SPI
+                                                прошел успешно
+    453    00022F 21....       LD HL,CMD08    ;запрос на поддерживаемые
+                                               напряжения
+    454    000232 CD....       CALL OUTCOM    ;команда поддерживается начиная
+                                               со спецификации
+    455    000235 CD....       CALL IN_OOUT    ;версии 2.0 и только SDHC, мини
+                                                и микро SD картами
+    456    000238 ED60         IN H,(C)    ;в A=код ответа карты
+    457    00023A 00           NOP    ;считываем 4 байта длинного ответа
+    458    00023B ED60         IN H,(C)    ;но не используем
+    459    00023D 00           NOP
+    460    00023E ED60         IN H,(C)
+    461    000240 00           NOP
+    462    000241 ED60         IN H,(C)
+    463    000243 210000       LD HL,0    ;HL=аргумент для команды инициализаци
+                                          и
+    464    000246 CB57         BIT 2,A    ;если бит 2 установлен, то карта
+                                           стандартная
+    465    000248 2002         JR NZ,ZAW006    ;стандартная карта выдаст
+                                                <ошибка команды>
+    466    00024A 2640         LD H,0x40    ;если ошибки не было, то карта
+                                             SDHC, мини или микро SD
+    467    00024C          ZAW006    
+    468    00024C 3E77         LD A,CMD_55    ;запускаем процесс внутренней
+                                               инициализации
+    469    00024E CD....       CALL OUT_COM    ;для карт MMC здесь должна быть
+                                                другая команда
+    470    000251 CD....       CALL IN_OOUT    ;соответственно наличие в слоте
+                                                MMC-карты
+    471    000254 3E69         LD A,ACMD_41    ;вызовет зависание драйвера, от
+                                                применения
+    472    000256 ED79         OUT (C),A    ;общей команды запуска инициализаци
+                                            и я отказался
+    473    000258 00           NOP    ;бит 6 установлен для инициализации SDHC
+                                       карты
+    474    000259 ED61         OUT (C),H    ;для стандартной сброшен
+    475    00025B 00           NOP
+    476    00025C ED69         OUT (C),L
+    477    00025E 00           NOP
+    478    00025F ED69         OUT (C),L
+    479    000261 00           NOP
+    480    000262 ED69         OUT (C),L
+    481    000264 3EFF         LD A,0xFF
+    482    000266 ED79         OUT (C),A
+    483    000268 CD....       CALL IN_OOUT    ;ждем перевода карты в режим
+                                                готовности
+    484    00026B A7           AND A    ;время ожидания примерно 1 секунда
+    485    00026C 20DE         JR NZ,ZAW006
+    486    00026E 3E7B     ZAW004    LD A,CMD_59    ;принудительно отключаем
+                                                     CRC16
+    487    000270 CD....       CALL OUT_COM
+    488    000273 CD....       CALL IN_OOUT
+    489    000276 A7           AND A
+    490    000277 20F5         JR NZ,ZAW004
+    491    000279 21....   ZAW005    LD HL,CMD16    ;принудительно задаем
+                                                     размер блока 512
+                                                     байт
+    492    00027C CD....       CALL OUTCOM
+    493    00027F CD....       CALL IN_OOUT
+    494    000282 A7           AND A
+    495    000283 20F4         JR NZ,ZAW005
+    496    000285          ;включение питания карты при снятом сигнале выбора
+                            карты
+    497    000285 F5       CS_HIGH    PUSH AF
+    498    000286 3E03         LD A,3
+    499    000288 D377         OUT (P_CONF),A    ;включаем питание, снимаем
+                                                  выбор карты
+    500    00028A AF           XOR A
+    501    00028B D357         OUT (P_DATA),A    ;обнуляем порт данных
+    502    00028D F1           POP AF    ;обнуление порта можно не делать,
+                                          просто последний
+    503    00028E 3E00         ld a,0
+    504    000290 C9           RET    ;записанный бит всегда 1, а при сбросе
+                                       через вывод
+    505    000291                  ;данных карты напряжение попадает на вывод
+                            питания
+    506    000291                  ;карты и светодиод на питании подсвечивается
+    507    000291          ;возврат при не ответе карты с кодом ошибки
+                            1
+    508    000291          ZAW003    
+    509    000291 CD....       CALL zsd_off
+    510    000294 3E03         ld a,3
+    511    000296 C9           RET
+    512    000297          zsd_off    
+    513    000297 AF           XOR A
+    514    000298 D377         OUT (P_CONF),A    ;выключение питания карты
+    515    00029A D357         OUT (P_DATA),A    ;обнуление порта данных
+    516    00029C C9           RET
+    517    00029D          ;выбираем карту сигналом 0
+    518    00029D          CS__LOW    
+    519    00029D F5           PUSH AF
+    520    00029E 3E01         LD A,1
+    521    0002A0 D377         OUT (P_CONF),A
+    522    0002A2 F1           POP AF
+    523    0002A3 C9           RET
+    524    0002A4          ;запись в карту команды с неизменяемым параметром из
+                            памяти
+    525    0002A4          ;адрес команды в <HL>
+    526    0002A4          OUTCOM    
+    527    0002A4 CD....       CALL CS__LOW
+    528    0002A7 C5           PUSH BC
+    529    0002A8 015706       LD BC,0x600+P_DATA
+    530    0002AB EDB3         OTIR    ;передаем 6 байт команды из памяти
+    531    0002AD C1           POP BC
+    532    0002AE C9           RET
+    533    0002AF          ;запись в карту команды с нулевыми аргументами
+    534    0002AF          ;А-код команды, аргумент команды равен 0
+    535    0002AF          OUT_COM    
+    536    0002AF C5           PUSH BC
+    537    0002B0 CD....       CALL CS__LOW
+    538    0002B3 015700       LD BC,P_DATA
+    539    0002B6 ED79         OUT (C),A
+    540    0002B8 AF           XOR A
+    541    0002B9 ED79         OUT (C),A
+    542    0002BB 00           NOP
+    543    0002BC ED79         OUT (C),A
+    544    0002BE 00           NOP
+    545    0002BF ED79         OUT (C),A
+    546    0002C1 00           NOP
+    547    0002C2 ED79         OUT (C),A
+    548    0002C4 3D           DEC A
+    549    0002C5 ED79         OUT (C),A    ;пишем пустой CRC7 и стоповый
+                                             бит
+    550    0002C7 C1           POP BC
+    551    0002C8 C9           RET
+    552    0002C9          ;запись команды чтения/записи с номером сектора в
+                            BCDE для карт стандартного размера
+    553    0002C9          ;при изменяемом размере сектора номер сектора нужно
+                            умножать на его размер, для карт 
+    554    0002C9          ;SDHC, мини и микро размер сектора не требует
+                            умножения
+    555    0002C9 E5       SECM200    PUSH HL
+    556    0002CA D5           PUSH DE
+    557    0002CB C5           PUSH BC
+    558    0002CC F5           PUSH AF
+    559    0002CD C5           PUSH BC
+    560    0002CE 3E7A         LD A,CMD_58
+    561    0002D0 015700       LD BC,P_DATA
+    562    0002D3 CD....       CALL OUT_COM
+    563    0002D6 CD....       CALL IN_OOUT
+    564    0002D9 ED78         IN A,(C)
+    565    0002DB 00           NOP
+    566    0002DC ED60         IN H,(C)
+    567    0002DE 00           NOP
+    568    0002DF ED60         IN H,(C)
+    569    0002E1 00           NOP
+    570    0002E2 ED60         IN H,(C)
+    571    0002E4 CB77         BIT 6,A    ;проверяем 30 бит регистра OCR (6 бит
+                                           в <А>)        
+    572    0002E6 E1           POP HL    ;при установленном бите умножение
+                                          номера сектора
+    573    0002E7 200A         JR NZ,SECN200    ;не требуется
+    574    0002E9 EB           EX DE,HL    ;при сброшенном бите соответственно
+    575    0002EA 29           ADD HL,HL    ;умножаем номер сектора на 512
+                                             (0x200)
+    576    0002EB EB           EX DE,HL
+    577    0002EC ED6A         ADC HL,HL
+    578    0002EE 65           LD H,L
+    579    0002EF 6A           LD L,D
+    580    0002F0 53           LD D,E
+    581    0002F1 1E00         LD E,0
+    582    0002F3          SECN200    
+    583    0002F3 F1           POP AF    ;заготовленный номер сектора находится
+                                          в <HLDE>
+    584    0002F4 ED79         OUT (C),A    ;пишем команду из <А> на SD
+                                             карту
+    585    0002F6 00           NOP    ;записываем 4 байта аргумента
+    586    0002F7 ED61         OUT (C),H    ;пишем номер сектора от старшего
+    587    0002F9 00           NOP
+    588    0002FA ED69         OUT (C),L
+    589    0002FC 00           NOP
+    590    0002FD ED51         OUT (C),D
+    591    0002FF 00           NOP
+    592    000300 ED59         OUT (C),E    ;до младшего байта
+    593    000302 3EFF         LD A,0xFF
+    594    000304 ED79         OUT (C),A    ;пишем пустой CRC7 и стоповый
+                                             бит
+    595    000306 C1           POP BC
+    596    000307 D1           POP DE
+    597    000308 E1           POP HL
+    598    000309 C9           RET
+    599    00030A          ;чтение ответа карты до 32 раз, если ответ не 0xFF -
+                            немедленный выход
+    600    00030A D5       IN_OOUT    PUSH DE
+    601    00030B 11FF20       LD DE,0x20FF
+    602    00030E DB57     IN_WAIT    IN A,(P_DATA)
+    603    000310 BB           CP E
+    604    000311 2003         JR NZ,IN_EXIT
+    605    000313 15       IN_NEXT    DEC D
+    606    000314 20F8         JR NZ,IN_WAIT
+    607    000316 D1       IN_EXIT    POP DE
+    608    000317 C9           RET
+    609    000318 40000000*CMD00    DEFB  0x40,0x00,0x00,0x00,0x00,0x95
+                                                 ;GO_IDLE_STATE
+    610    00031E              ;команда сброса и перевода карты в SPI режим
+                            после включения питания
+    611    00031E 48000001*CMD08    DEFB  0x48,0x00,0x00,0x01,0xAA,0x87
+                                                 ;SEND_IF_COND
+    612    000324              ;запрос поддерживаемых напряжений
+    613    000324 50000002*CMD16    DEFB 0x50,0x00,0x00,0x02,0x00,0xFF
+                                                ;SET_BLOCKEN
+    614    00032A              ;команда изменения размера блока
+    615    00032A          ;читаем один сектор из карты в память, адрес чтения
+                            в <HL>
+    616    00032A C5       RD_SECT    PUSH BC
+    617    00032B 015700       LD BC,P_DATA
+    618    00032E EDB2         INIR
+    619    000330 00           NOP
+    620    000331 EDB2         INIR
+    621    000333 00           NOP
+    622    000334 ED78         IN A,(C)
+    623    000336 00           NOP
+    624    000337 ED78         IN A,(C)
+    625    000339 C1           POP BC
+    626    00033A C9           RET
+    627    00033B          ;записываем один сектор из памяти в карту, адрес
+                            записи в <HL>
+    628    00033B C5       WR_SECT    PUSH BC
+    629    00033C 015700       LD BC,P_DATA
+    630    00033F ED79         OUT (C),A
+    631    000341 00           NOP
+    632    000342 EDB3         OTIR
+    633    000344 00           NOP
+    634    000345 EDB3         OTIR
+    635    000347 3EFF         LD A,0xFF
+    636    000349 ED79         OUT (C),A
+    637    00034B 00           NOP
+    638    00034C ED79         OUT (C),A
+    639    00034E C1           POP BC
+    640    00034F C9           RET
+    641    000350          ;многосекторное чтение
+    642    000350          zsd_read
+    643    000350 3E52         LD A,CMD_18
+    644    000352 CD....       CALL SECM200    ;даем команду многосекторного
+                                                чтения
+    645    000355 08           EX AF,AF
+    646    000356 08       RDMULT1    EX AF,AF
+    647    000357          RDMULT2
+    648    000357 CD....       CALL IN_OOUT
+    649    00035A FEFE         CP 0xFE
+    650    00035C 20F9         JR NZ,RDMULT2    ;ждем маркер готовности 0xFE
+                                                 для начала чтения
+    651    00035E CD....       CALL RD_SECT    ;читаем сектор
+    652    000361 08           EX AF,AF
+    653    000362 3D           DEC A
+    654    000363 20F1         JR NZ,RDMULT1    ;продолжаем пока не обнулится
+                                                 счетчик
+    655    000365 3E4C         LD A,CMD_12    ;по окончании чтения даем команду
+                                               карте <СТОП>
+    656    000367 CD....       CALL OUT_COM    ;команда мультичтения не имеет
+                                                счетчика и
+    657    00036A          RDMULT3
+    658    00036A CD....       CALL IN_OOUT    ;должна останавливаться здесь
+                                                командой 12
+    659    00036D 3C           INC A
+    660    00036E 20FA         JR NZ,RDMULT3    ;ждем освобождения карты
+    661    000370 C3....       JP CS_HIGH    ;снимаем выбор с карты и выходим с
+                                              кодом 0
+    662    000373          
+    663    000373          ;многосекторная запись
+    664    000373          zsd_write
+    665    000373 3E59         LD A,CMD_25 ;даем команду мультисекторной
+                                            записи
+    666    000375 CD....       CALL SECM200
+    667    000378          WRMULTI2
+    668    000378 CD....       CALL IN_OOUT
+    669    00037B 3C           INC A
+    670    00037C 20FA         JR NZ,WRMULTI2 ;ждем освобождения карты
+    671    00037E 08           EX AF,AF
+    672    00037F 08       WRMULT1 EX AF,AF
+    673    000380 3EFC         LD A,0xFC ;пишем стартовый маркер, сам блок и
+                                          пустое CRC16
+    674    000382 CD....       CALL WR_SECT
+    675    000385          WRMULTI3
+    676    000385 CD....       CALL IN_OOUT
+    677    000388 3C           INC A
+    678    000389 20FA         JR NZ,WRMULTI3 ;ждем освобождения карты
+    679    00038B 08           EX AF,AF
+    680    00038C 3D           DEC A
+    681    00038D 20F0         JR NZ,WRMULT1 ;продолжаем пока счетчик не
+                                              обнулится
+    682    00038F 0E57         LD C,P_DATA
+    683    000391 3EFD         LD A,0xFD
+    684    000393 ED79         OUT (C),A ;даем команду остановки записи
+    685    000395          WRMULTI4
+    686    000395 CD....       CALL IN_OOUT
+    687    000398 3C           INC A
+    688    000399 20FA         JR NZ,WRMULTI4 ;ждем освобождения карты
+    689    00039B C3....       JP CS_HIGH ;снимаем выбор карты и выходим с
+                                           кодом 0
+    690    00039E              
+    691    00039E              
+    692    00039E          ;---------------------------------------------------
+                           ---
+    693    00039E          ;---------------------------=NeoGS=-----------------
+                           ---
+    694    00039E          ;---------------------------------------------------
+                           ---
+    695    00039E          
+    696    00039E          
+    697    00039E          
+    698    0000BB          GSCOM           EQU 0XBB        ; write-only,
+                            command for NGS
+    699    0000B3          GSDAT           EQU 0XB3        ; read-write
+    700    000033          GSCTR           EQU 0X33        ; write-only,
+                            control register for NGS:
+    701    00039E          ;АДРЕС УСТАНОВЩИКА ДРАЙВЕРА НА NeoGS
+    702    005B00          SETUPSD         EQU 0x5B00
+    703    00039E          
+    704    00039E          ;NGSSDT         DEFW GSDINIT            ;ИНИТ SD
+                            КАРТЫ
+    705    00039E          ;               DEFW GSDOFF             ;ОТКЛЮЧЕНИЕ
+                            SD КАРТЫ
+    706    00039E          ;               DEFW SDRDSIN            ;ЧИТАТЬ 1
+                            СЕКТОР
+    707    00039E          ;               DEFW SDRDMUL            ;ЧИТАТЬ "A"
+                            СЕКТОРОВ
+    708    00039E          ;               DEFW SDWRSIN            ;ПИСАТЬ 1
+                            СЕКТОР
+    709    00039E          ;               DEFW SDWRMUL            ;ПИСАТЬ "A"
+                            СЕКТОРОВ
+    710    00039E          
+    711    00039E          ;ЗАПИСЬ "A" СЕКТОРОВ
+    712    00039E 3E05     SDWRMUL         LD A,5
+    713    0003A0 CD....   SDWRSN3         CALL COMM2SD
+    714    0003A3 08                       EX AF,AF
+    715    0003A4 D5                       PUSH DE
+    716    0003A5 C5                       PUSH BC
+    717    0003A6 01B300                   LD BC,GSDAT
+    718    0003A9 08       SDWRSN1         EX AF,AF
+    719    0003AA D3BB                     OUT (GSCOM),A
+    720    0003AC CD....                   CALL WC_
+    721    0003AF 110002                   LD DE,0x0200
+    722    0003B2 EDA3     SDWRSN2         OUTI
+    723    0003B4 CD....                   CALL WD_
+    724    0003B7 1B                       DEC DE
+    725    0003B8 7A                       LD A,D
+    726    0003B9 B3                       OR E
+    727    0003BA 20F6                     JR NZ,SDWRSN2
+    728    0003BC 08                       EX AF,AF
+    729    0003BD 3D                       DEC A
+    730    0003BE 20E9                     JR NZ,SDWRSN1
+    731    0003C0 CD....                   CALL WN_
+    732    0003C3 ED78                     IN A,(C)
+    733    0003C5 FE77                     CP 0x77
+    734    0003C7 20FA                     JR NZ,$-4
+    735    0003C9 C1                       POP BC
+    736    0003CA D1                       POP DE
+    737    0003CB AF                       XOR A
+    738    0003CC C9                       RET
+    739    0003CD          
+    740    0003CD          ;ЧТЕНИЕ "A" СЕКТОРОВ
+    741    0003CD 3E03     SDRDMUL         LD A,3
+    742    0003CF CD....   SDRDSN3         CALL COMM2SD
+    743    0003D2 08                       EX AF,AF
+    744    0003D3 D5                       PUSH DE
+    745    0003D4 C5                       PUSH BC
+    746    0003D5 01B300                   LD BC,GSDAT
+    747    0003D8 08       SDRDSN1         EX AF,AF
+    748    0003D9 D3BB                     OUT (GSCOM),A
+    749    0003DB CD....                   CALL WC_
+    750    0003DE 110002                   LD DE,0x0200
+    751    0003E1 CD....   SDRDSN2         CALL WN_
+    752    0003E4 EDA2                     INI
+    753    0003E6 1B                       DEC DE
+    754    0003E7 7A                       LD A,D
+    755    0003E8 B3                       OR E
+    756    0003E9 20F6                     JR NZ,SDRDSN2
+    757    0003EB 08                       EX AF,AF
+    758    0003EC 3D                       DEC A
+    759    0003ED 20E9                     JR NZ,SDRDSN1
+    760    0003EF CD....                   CALL WN_
+    761    0003F2 ED78                     IN A,(C)
+    762    0003F4 FE77                     CP 0x77
+    763    0003F6 20FA                     JR NZ,$-4
+    764    0003F8 C1                       POP BC
+    765    0003F9 D1                       POP DE
+    766    0003FA AF                       XOR A
+    767    0003FB C9                       RET
+    768    0003FC          
+    769    0003FC          ;ОТКЛЮЧЕНИЕ ВЫБОРА КАРТОЧКИ
+    770    0003FC 3E01     GSDOFF          LD A,1
+    771    0003FE 1801                     JR GSDINIT+1
+    772    000400          
+    773    000400          ;ИНИЦИАЛИЗАЦИЯ КАРТОЧКИ
+    774    000400 CD....   GSDINIT         CALL INSTSDD
+    775    000403 B7                       OR A
+    776    000404 C0                       RET NZ
+    777    000405 AF                       XOR A
+    778    000406 CD....                   CALL COMM2SD
+    779    000409 CD....                   CALL WN_
+    780    00040C DBB3                     IN A,(GSDAT)
+    781    00040E FE77                     CP 0x77
+    782    000410 2002                     JR NZ,SD_NO
+    783    000412 AF                       XOR A
+    784    000413 C9                       RET
+    785    000414          
+    786    000414 3E01     SD_NO           LD A,1
+    787    000416 C9                       RET
+    788    000417          
+    789    000417          ;ПЕРЕДАТЧИК КОМАНД/ПАРАМЕТРОВ В ДРАЙВЕР НА
+                            NeoGS
+    790    000417 D3B3     COMM2SD         OUT (GSDAT),A                  
+                                                       ;УШЛА КОМАНДА ДРАЙВЕРУ
+    791    000419 3E1E                     LD A,0x1E
+    792    00041B D3BB                     OUT (GSCOM),A
+    793    00041D CD....                   CALL WC_                       
+  ;УШЛА КОМАНДА ПРОШИВКЕ
+    794    000420 78                       LD A,B
+    795    000421 D3B3                     OUT (GSDAT),A
+    796    000423 CD....                   CALL WD_                       
+  ;УШЛИ БИТЫ 31-24 ПАРАМЕТРОВ
+    797    000426 79                       LD A,C
+    798    000427 D3B3                     OUT (GSDAT),A
+    799    000429 CD....                   CALL WD_                       
+  ;УШЛИ БИТЫ 23-16 ПАРАМЕТРОВ
+    800    00042C 7A                       LD A,D
+    801    00042D D3B3                     OUT (GSDAT),A
+    802    00042F CD....                   CALL WD_                       
+  ;УШЛИ БИТЫ 15-8 ПАРАМЕТРОВ
+    803    000432 7B                       LD A,E
+    804    000433 D3B3                     OUT (GSDAT),A
+    805    000435 CD....                   CALL WD_                       
+  ;УШЛИ БИТЫ 7-0 ПАРАМЕТРОВ
+    806    000438 08                       EX AF,AF
+    807    000439 D3B3                     OUT (GSDAT),A
+    808    00043B 08                       EX AF,AF
+    809    00043C                          DEFS 9
+    810    000445 C9                       RET                            
+  ;УШЛО КОЛ-ВО СЕКТОРОВ
+    811    000446          
+    812    000446          ;ОЖИДАНИЕ КОГДА NeoGS БАЙТ ЗАБЕРЕТ
+    813    000446 DBBB     WD_             IN A,(GSCOM)
+    814    000448 17                       RLA
+    815    000449 38FB                     JR C,$-3
+    816    00044B C9                       RET
+    817    00044C          
+    818    00044C          ;ОЖИДАНИЕ КОГДА NeoGS ДАСТ БАЙТ
+    819    00044C DBBB     WN_             IN A,(GSCOM)
+    820    00044E 17                       RLA
+    821    00044F 30FB                     JR NC,$-3
+    822    000451 C9                       RET
+    823    000452          
+    824    000452          ;ОЖИДАНИЕ КОГДА NeoGS КОМАНДУ ЗАБЕРЕТ
+    825    000452 DBBB     WC_             IN A,(GSCOM)
+    826    000454 1F                       RRA
+    827    000455 38FB                     JR C,$-3
+    828    000457 C9                       RET
+    829    000458          
+    830    000458          ;УСТАНОВЩИК ДРАЙВЕРА НА NeoGS
+    831    000458 3E80     INSTSDD         LD A,0x80
+    832    00045A D333                     OUT (GSCTR),A
+    833    00045C FB                       EI
+    834    00045D 76                       HALT
+    835    00045E 76                       HALT
+    836    00045F F3                       DI
+    837    000460 3EF3                     LD A,0xF3
+    838    000462 0630                     LD B,0x30
+    839    000464 D3BB                     OUT (GSCOM),A
+    840    000466 FB       ISDD1           EI
+    841    000467 76                       HALT
+    842    000468 F3                       DI
+    843    000469 05                       DEC B
+    844    00046A 28A8                     JR Z,SD_NO
+    845    00046C DBBB                     IN A,(GSCOM)
+    846    00046E 1F                       RRA
+    847    00046F 38F5                     JR C,ISDD1
+    848    000471 01B300                   LD BC,GSDAT
+    849    000474 ED78                     IN A,(C)
+    850    000476 110003                   LD DE,0x0300
+    851    000479 21005B                   LD HL,SETUPSD
+    852    00047C ED59                     OUT (C),E
+    853    00047E 3E14                     LD A,0x14
+    854    000480 D3BB                     OUT (GSCOM),A
+    855    000482 CD....                   CALL WC_
+    856    000485 ED51                     OUT (C),D
+    857    000487 CD....                   CALL WD_
+    858    00048A ED69                     OUT (C),L
+    859    00048C CD....                   CALL WD_
+    860    00048F ED61                     OUT (C),H
+    861    000491 CD....                   CALL WD_
+    862    000494 2A0600                   LD HL,(0x0006)
+    863    000497 EDA3     ISDD3           OUTI
+    864    000499 CD....                   CALL WD_
+    865    00049C 1B                       DEC DE
+    866    00049D 7A                       LD A,D
+    867    00049E B3                       OR E
+    868    00049F 20F6                     JR NZ,ISDD3
+    869    0004A1 21005B                   LD HL,SETUPSD
+    870    0004A4 ED69                     OUT (C),L
+    871    0004A6 3E13                     LD A,0x13
+    872    0004A8 D3BB                     OUT (GSCOM),A
+    873    0004AA CD....                   CALL WC_
+    874    0004AD ED61                     OUT (C),H
+    875    0004AF FB                       EI
+    876    0004B0 76                       HALT
+    877    0004B1 76                       HALT
+    878    0004B2 F3                       DI
+    879    0004B3 DBB3                     IN A,(GSDAT)
+    880    0004B5 FE77                     CP 0x77
+    881    0004B7 C2....                   JP NZ,SD_NO
+    882    0004BA AF                       XOR A
+    883    0004BB C9                       RET
+    884    0004BC          
+    885    0004BC          
+    886    0004BC          
+    887    0004BC          ENDMOD
+##############################
+#          CRC:CA6B          #
+#        Errors:   0         #
+#        Warnings: 0         #
+#        Bytes: 1203         #
+##############################
+
+
+
+##############################
+#          CRC:CA6B          #
+#        Errors:   0         #
+#        Warnings: 0         #
+#        Bytes: 1203         #
+##############################
+
+
+
+
