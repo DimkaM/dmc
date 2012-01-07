@@ -3,13 +3,16 @@ fnostart=0xc000
 	CALL printerr
 	jp nz,_ERRJMP
 	ENDM
+
 	MACRO CHK_ERR_JR _ERRJMP
 	CALL printerr
 	jr nz,_ERRJMP
 	ENDM
+
 	MACRO CHK_ERR
 	CALL printerr
 	ENDM
+
 	MACRO CHK_ERR_RET
 	OR A
 	jp NZ,printerr.l1
@@ -63,6 +66,7 @@ get_fno
 	ld a,FILINFO.FNAME
 	add (IX+txt.FWIN.poz):ld l,a
 	LD h,(IX+txt.FWIN.poz+1)
+	ret
 .prev
 	ld a,FILINFO.PREVP
 	jr .l1
