@@ -92,7 +92,7 @@ xy2scr			;input hl=xy
 	;jr nc,.l1
 	;ld a,#87
 	rr a
-.l1	add a,l
+	add a,l
 	ld l,h
 	ld h,a
 	xor a
