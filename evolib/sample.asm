@@ -10,9 +10,7 @@ begin
 	call txt.clsall
 	ld a,0x20
 	ld (ix+txt.WIN.atr),a
-	;call txt.clswin
 	MEM_FAT
-	;call REGINI
 	F_CHDRIVE 0
 	F_MOUNT 0,lfatfs
 	F_MOUNT 1,rfatfs
@@ -24,8 +22,6 @@ begin
 	WIN_SET_AT a,a
 	PRINTW help.str
 	ld ix,lpan
-	;call txt.clswin
-	;jp chdrv.l3
 	call readfnos
 	call pr_flist_new
 
@@ -272,13 +268,13 @@ curstab
 	push hl:pop ix
 	LD a,(IX+txt.FWIN.p_poz)
 	ld bc,mem.b3:out (c),a
-	MEM_FFF
+	MEM_FAT
 	ld e,(ix+txt.FWIN.drive)
 	F_CHDR
 	jp mainloop
 cursent
 	CALL txt.cursor_v
-	MEM_FFF
+	MEM_FAT
 	call get_fno.name
 	DEC hl
 	ld a,0x10
