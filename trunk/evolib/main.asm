@@ -12,18 +12,18 @@ INI
 rst18
 	org #18
 	;push hl
-    ADD A,A
-    LD HL,fatfs.tabl
-    ADD A,L
-    LD L,A
-    LD A,H
-    ADC A,0
-    LD H,A
-    LD A,(HL)
-    INC HL
-    LD H,(HL)
-    LD L,A
-    jp (hl);ex (sp),hl
+	ADD A,A
+	LD HL,fatfs.tabl
+	ADD A,L
+	LD L,A
+	LD A,H
+	ADC A,0
+	LD H,A
+	LD A,(HL)
+	INC HL
+	LD H,(HL)
+	LD L,A
+	jp (hl);ex (sp),hl
 	;MEM_HIDE
 	;ret
 

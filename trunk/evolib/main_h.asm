@@ -1,9 +1,9 @@
 ; REG
-; .DAT=#F8EF	;80-bf
-; .DLL=#F8EF	;80-9f
-; .DLM=#F9EF	;a0-bf
-; .LCR=#FBEF	;a0-10100000
-; .LSR=#FDEF	;80-10000000
+; .DAT=0xF8EF	;80-bf
+; .DLL=0xF8EF	;80-9f
+; .DLM=0xF9EF	;a0-bf
+; .LCR=0xFBEF	;a0-10100000
+; .LSR=0xFDEF	;80-10000000
 	; display $
 ; REGINI
 	; LD BC,REG.LCR
@@ -42,41 +42,21 @@
 	ld hl,_ADDR:ld (hl),A:ld de,_ADDR+1
 	LD BC,_SIZE-1:LDIR
 	ENDM
-	
-	MACRO MEM_GETPAGE S
-	LD BC,#00BE+(S<<8)
-	IN A,(C)
-	ENDM
-	
-	MACRO MEM_SETPAGE S,P
-	LD A,P
-	XOR #FF
-	LD BC,#37F7+(S<<14)
-	OUT (C),A
-	ENDM
-	
+
 	MACRO MEM_UNHIDE
 	ld a,1
-	out	(#BF),a	
+	out (0xBF),a	
 	ENDM
 	
 	MACRO MEM_HIDE
 	xor a
-	out	(#BF),a	
+	out (0xBF),a	
 	ENDM
 	
-	MACRO MEM_TXT
-	call mem.settxt
-	ENDM
-		
 	MACRO MEM_SCR
 	call mem.setscr
 	ENDM
 	
-	MACRO MEM_FFF
-	call mem.setfff
-	ENDM
-
 	MACRO MEM_FAT
 	call mem.setfat
 	ENDM
@@ -144,27 +124,11 @@ setscr
 	ld a,txt_p
 	ld bc,b1
 	out (c),a
+	IFN TEXTMODE
 	ld a,attr_p
 	ld b,high b2
 	out (c),a
-	; ld a,buff_p
-	; ld b,high b3
-	; out (c),a
-	; MEM_HIDE
-	ret
-	
-setfff
-	MEM_UNHIDE
-	ld a,fat_p
-	ld bc,b1
-	out (c),a
-	; ld a,(ix+txt.FWIN.pages)
-	; ld b,high b3
-	; out (c),a
-	; inc a
-	; ld b,high b2
-	; out (c),a
-	MEM_HIDE
+	ENDIF
 	ret
 	
 setfat
@@ -187,7 +151,7 @@ setfat
 ; При попадании в функцию на стеке должен быть адрес возврата, затем список переменных,
 ; в связи с этим в RST18 JP, а не CALL.
 ; 
-; Строковая переменная должна заканчиватся #0 (нулём).
+; Строковая переменная должна заканчиватся 0x0 (нулём).
 ; Можно использовать как абсолютный, так 
 ; относительный путь:
 ; 	"file.txt"		A file in the current directory of the current drive
@@ -206,7 +170,7 @@ setfat
 ;
 ; Возвращаемый параметр лежит в HL, если DWORD то DEHL.
 ; 
-; FatFs юзает RST#18 для доступа к устройствам (0-3 функции).
+; FatFs юзает RST0x18 для доступа к устройствам (0-3 функции).
 ; Левые порты должны быть скрыты (MEM_HIDE)
 ; 31 и 30 страницы памяти должны быть в 0 и 1 банках.
 ; Стек должен быть в текущем адресном пространстве (юзается очень сильно байт 100-200 
@@ -215,15 +179,15 @@ setfat
 
 ;------------------------СТРУКТУРЫ--------------------------------------
 
-FA_READ=#01			;Specifies read access to the object. Data can be read from the file.
+FA_READ=0x01			;Specifies read access to the object. Data can be read from the file.
 					;Combine with FA_WRITE for read-write access.
-FA_WRITE=#02			;Specifies write access to the object. Data can be written to the file.
+FA_WRITE=0x02			;Specifies write access to the object. Data can be written to the file.
 					;Combine with FA_READ for read-write access.
-FA_OPEN_EXISTING=#00	;Opens the file. The function fails if the file is not existing. (Default)
-FA_OPEN_ALWAYS=#10	;Opens the file if it is existing. If not, a new file is created.
+FA_OPEN_EXISTING=0x00	;Opens the file. The function fails if the file is not existing. (Default)
+FA_OPEN_ALWAYS=0x10	;Opens the file if it is existing. If not, a new file is created.
 					;To append data to the file, use f_lseek function after file open in this method.
-FA_CREATE_NEW=#04		;Creates a new file. The function fails with FR_EXIST if the file is existing.
-FA_CREATE_ALWAYS=#08	;Creates a new file. If the file is existing, it is truncated and overwritten.
+FA_CREATE_NEW=0x04		;Creates a new file. The function fails with FR_EXIST if the file is existing.
+FA_CREATE_ALWAYS=0x08	;Creates a new file. If the file is existing, it is truncated and overwritten.
 
 
 
@@ -310,7 +274,7 @@ BUF		BLOCK 512	;/* File data read/write buffer */
 	LD L,_PART
 	PUSH HL
 	LD A,4			; номер функции, кстати она исключение из правил, на стеке
-	RST #18			; остаётся только VOL, а он как раз пригодится нам в F_MOUNT
+	RST 0x18			; остаётся только VOL, а он как раз пригодится нам в F_MOUNT
 	ENDM
 	
 	
@@ -326,11 +290,11 @@ BUF		BLOCK 512	;/* File data read/write buffer */
 	ld e,_VOL
 	LD bc,_FS
 	LD A,0
-	RST #18
+	RST 0x18
 	ENDM
 	MACRO F_MNT
 	LD A,0
-	RST #18
+	RST 0x18
 	ENDM
 	
 	
@@ -345,7 +309,7 @@ BUF		BLOCK 512	;/* File data read/write buffer */
 	LD HL,_MODE
 	PUSH HL
 	LD A,1
-	RST #18
+	RST 0x18
 	POP BC
 	ENDM
 	
@@ -360,7 +324,7 @@ BUF		BLOCK 512	;/* File data read/write buffer */
 ;	UINT *br		/* Pointer to number of bytes read */
 	MACRO F_READ
 	LD A,2
-	RST #18
+	RST 0x18
 	ENDM
 
 ;/*-----------------------------------------------------------------------*/
@@ -373,7 +337,7 @@ BUF		BLOCK 512	;/* File data read/write buffer */
 ;	UINT *bw			/* Pointer to number of bytes written */
 	MACRO F_WRITE
 	LD A,8
-	RST #18
+	RST 0x18
 	ENDM
 
 ; /*-----------------------------------------------------------------------*/
@@ -384,7 +348,7 @@ BUF		BLOCK 512	;/* File data read/write buffer */
 	MACRO F_CLOSE _FP
 	ld de,_FP
 	LD A,4
-	RST #18
+	RST 0x18
 	ENDM
 
 	
@@ -402,7 +366,7 @@ BUF		BLOCK 512	;/* File data read/write buffer */
 	ENDM
 	MACRO F_OPDIR
 	LD A,5
-	RST #18
+	RST 0x18
 	ENDM
 
 ; /*-----------------------------------------------------------------------*/
@@ -415,7 +379,7 @@ BUF		BLOCK 512	;/* File data read/write buffer */
 ; )
 	MACRO F_RDIR
 	LD A,6
-	RST #18
+	RST 0x18
 	ENDM
 
 
@@ -426,7 +390,7 @@ BUF		BLOCK 512	;/* File data read/write buffer */
 ;	const TCHAR *path		/* Pointer to the file or directory path */
 	MACRO F_UNLINK
 	LD A,12
-	RST #18
+	RST 0x18
 	ENDM
 ;/*-----------------------------------------------------------------------*/
 ;/* Create a Directory                                                    */
@@ -435,7 +399,7 @@ BUF		BLOCK 512	;/* File data read/write buffer */
 ;	const TCHAR *path		/* Pointer to the directory path */
 	MACRO F_MKDIR
 	LD A,13
-	RST #18
+	RST 0x18
 	ENDM
 ;/*-----------------------------------------------------------------------*/
 ;/* Rename File/Directory                                                 */
@@ -446,7 +410,7 @@ BUF		BLOCK 512	;/* File data read/write buffer */
 
 	MACRO F_RENAME
 	LD A,16
-	RST #18
+	RST 0x18
 	ENDM
 
 ;/*-----------------------------------------------------------------------*/
@@ -456,7 +420,7 @@ BUF		BLOCK 512	;/* File data read/write buffer */
 ;	BYTE drv		/* Drive number */
 	MACRO F_CHDR
 	LD A,17
-	RST #18
+	RST 0x18
 	ENDM
 	MACRO F_CHDRIVE _DRV
 	LD e,_DRV
@@ -468,7 +432,7 @@ BUF		BLOCK 512	;/* File data read/write buffer */
 ; )
 	MACRO F_CHDIR 
 	LD A,18
-	RST #18
+	RST 0x18
 	ENDM
 	
 	
@@ -478,7 +442,7 @@ BUF		BLOCK 512	;/* File data read/write buffer */
 	LD de,_ARG
 	push de
 	LD A,19
-	RST #18
+	RST 0x18
 	endm
 
 ; /* File function return code (FRESULT) */
