@@ -169,8 +169,8 @@ mkdir
 	
 copy
 	CALL txt.cursor_v
-	call getfnocurs
-	ld de,inpstr:ld bc,13:ldir
+	call get_fno.name
+	ld de,inpstr:ld bc,12:ldir
 	WIN_GET_PAN h,l
 	push hl:ex (sp),ix
 	ld de,inpstr:call txt.progrbar.init
@@ -192,7 +192,7 @@ copy
 	MEM_FBUF
 	ld hl,.res:push hl
 .l1	call txt.progrbar.tik
-	MEM_FAT
+	;MEM_FAT
 	ld de,.fp1
 	ld bc,0xc000
 	ld hl,0x4000:push hl
@@ -236,7 +236,7 @@ delete
 	call txt.asker
 	jp nz,mainloop.l1
 	CALL txt.cursor_v
-	call getfnocurs
+	call get_fno.name
 	ex hl,de
 	MEM_FAT
 	F_UNLINK
@@ -247,10 +247,10 @@ delete
 rename
 	CALL txt.cursor_v
 	;MEM_FFF
-	call getfnocurs
+	call get_fno.name
 	ld a,'.':cp (hl):jp z,mainloop
 	push hl
-	MEM_SCR
+	;MEM_SCR
 	ld de,inpstr:xor a:ld (de),a
 	ld a,1
 	WIN_SET_CX A
@@ -269,8 +269,9 @@ curstab
 	CALL txt.cursor_v
 	ld l,(ix+txt.FWIN.pan)
 	ld h,(ix+txt.FWIN.pan+1)
-	push hl
-	pop ix
+	push hl:pop ix
+	LD a,(IX+txt.FWIN.p_poz)
+	ld bc,mem.b3:out (c),a
 	MEM_FFF
 	ld e,(ix+txt.FWIN.drive)
 	F_CHDR
@@ -278,7 +279,7 @@ curstab
 cursent
 	CALL txt.cursor_v
 	MEM_FFF
-	call getfnocurs
+	call get_fno.name
 	DEC hl
 	ld a,0x10
 	and (hl)
@@ -289,10 +290,7 @@ cursent
 	CHK_ERR_JMP mainloop
 .l2	call readfnos
 .l3	call pr_flist_new
-	
-.l1	
-	
-	jp mainloop
+.l1	jp mainloop
 
 cursright
 	CALL txt.cursor_v
@@ -405,7 +403,7 @@ readfnos				;de=dir
 	ret z
 	dec c:ld a,(bc):and 0x10:jr nz,.cat
 	ld a,0x20
-.cat ld (bc),a
+.cat	ld (bc),a
 	ld d,b,e,c
 	push bc
 	MEM_UNHIDE
@@ -425,7 +423,7 @@ readfnos				;de=dir
 .num	word 0
 
 fno_sort
-	xor a:ld hl,#8008:sbc hl,de:jp z,.first
+	xor a:ld hl,0x8008:sbc hl,de:jp z,.first
 	ld a,(ix+txt.FWIN.p_fno_1)
 	ld bc,mem.b3
 	out (c),a
@@ -436,7 +434,7 @@ fno_sort
 .l2	inc l,e
 	ld a,(de):or (hl):jr z,.prev
 	ld a,(de):cp (hl)
-.cat jr z,.l2
+.cat	jr z,.l2
 	jr c,.prev
 	ld a,l
 	and %11100000:or FILINFO.NEXT:ld l,a ;get fno

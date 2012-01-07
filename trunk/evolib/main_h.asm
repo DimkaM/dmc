@@ -73,7 +73,6 @@
 	call mem.setscr
 	ENDM
 	
-
 	MACRO MEM_FFF
 	call mem.setfff
 	ENDM
