@@ -1,6 +1,5 @@
 
 	module txt
-	
 	struct WIN
 x		byte		;location
 y		byte
@@ -146,7 +145,11 @@ fatfs	dw			;указатель на структуру fatfs
 	ENDM
 	
 	macro ATR2TXT
+	if TEXTMODE
+	ld a,%00110000
+	else
 	ld a,%11100000
+	endif
 	xor h
 	ld h,a
 	bit 5,h
