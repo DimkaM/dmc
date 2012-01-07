@@ -68,19 +68,11 @@
 	MACRO MEM_TXT
 	call mem.settxt
 	ENDM
-	
-	; MACRO MEM_ATTR
-	; call mem.setattr
-	; ENDM
-	
+		
 	MACRO MEM_SCR
 	call mem.setscr
 	ENDM
 	
-
-	; MACRO MEM_TFF
-	; call mem.settff
-	; ENDM
 
 	MACRO MEM_FFF
 	call mem.setfff
@@ -116,6 +108,32 @@ b1=0x77f7
 b2=0xb7f7
 b3=0xf7f7
 
+state	;состояние памяти
+.store	;сохраняем
+	in a,(0xbf)
+	ld (.shad+1),a
+	ld bc,0x05be
+	in a,(c):ld (.p1+1),a
+	inc b
+	in a,(c):ld (.p2+1),a
+	inc b
+	in a,(c):ld (.p3+1),a
+	ret
+.rest	;восстанавливаем
+	MEM_UNHIDE
+	ld bc,b1
+.p1	ld a,0
+	out (c),a
+	ld b,high b2
+.p2	ld a,0
+	out (c),a
+	ld b,high b3
+.p3	ld a,0
+	out (c),a
+.shad	ld a,0
+	out (0xbf),a
+	ret
+
 setscr
 	MEM_UNHIDE
 	ld a,txt_p
@@ -130,28 +148,14 @@ setscr
 	; MEM_HIDE
 	ret
 	
-;settff
-	; MEM_UNHIDE
-	; ld a,txt_p
-	; ld bc,b1
-	; out (c),a
-	; ld a,(ix+txt.FWIN.pages)
-	; ld b,high b3
-	; out (c),a
-	; inc a
-	; ld b,high b2
-	; out (c),a
-	; ;MEM_HIDE
-	; ret
-	
 setfff
 	MEM_UNHIDE
 	ld a,fat_p
 	ld bc,b1
 	out (c),a
-	ld a,(ix+txt.FWIN.pages)
-	ld b,high b3
-	out (c),a
+	; ld a,(ix+txt.FWIN.pages)
+	; ld b,high b3
+	; out (c),a
 	; inc a
 	; ld b,high b2
 	; out (c),a

@@ -141,14 +141,14 @@ about
 	jp mainloop
 .win	txt.WIN 27,8,25,10,0,0,0x30
 .txt	byte "assembly of 08.11.11",13
-		byte " Used sources:",13
-		byte " FatFs library......ChaN",13
-		byte " SD/HDD drivers..Savelij",13
-		byte " keyboard driver..Breeze",13
-		byte " shell............DimkaM",13
-		byte " Thanks: NedoPC,Vitamin,",13
-		byte " Deathsoft,TS-Labs",0
-
+	byte " Used sources:",13
+	byte " FatFs library......ChaN",13
+	byte " SD/HDD drivers..Savelij",13
+	byte " keyboard driver..Breeze",13
+	byte " shell............DimkaM",13
+	byte " Thanks: NedoPC,Vitamin,",13
+	byte " Deathsoft,TS-Labs",0
+	
 mkdir
 	CALL txt.cursor_v
 	MEM_SET inpstr,' ',12

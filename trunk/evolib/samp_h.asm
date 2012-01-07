@@ -59,6 +59,10 @@ pr_flist
 	WIN_SET_AT a,a
 	ret
 get_fno
+.name
+	ld a,FILINFO.FNAME
+	add (IX+txt.FWIN.poz):ld l,a
+	LD h,(IX+txt.FWIN.poz+1)
 .prev
 	ld a,FILINFO.PREVP
 	jr .l1
