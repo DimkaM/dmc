@@ -23,9 +23,7 @@ rst18
 	INC HL
 	LD H,(HL)
 	LD L,A
-	jp (hl);ex (sp),hl
-	;MEM_HIDE
-	;ret
+	jp (hl)
 
 	org #38
 	PUSH AF,BC,DE,HL

@@ -135,10 +135,17 @@ fatfs	dw			;указатель на структуру fatfs
 	endm
 	
 	macro TXT2ATR
+	if TEXTMODE
+	ld a,%00110000
+	xor h
+	ld h,a
+	bit 4,h
+	else
 	ld a,%11100000
 	xor h
 	ld h,a
 	bit 5,h
+	endif
 	jr nz,._T2A
 	inc hl
 ._T2A
@@ -147,12 +154,15 @@ fatfs	dw			;указатель на структуру fatfs
 	macro ATR2TXT
 	if TEXTMODE
 	ld a,%00110000
+	xor h
+	ld h,a
+	bit 4,h
 	else
 	ld a,%11100000
-	endif
 	xor h
 	ld h,a
 	bit 5,h
+	endif
 	jr z,._A2T
 	dec hl
 ._A2T
