@@ -47,7 +47,7 @@ void AtmVideoController::PrepareFrameATM2(int VideoMode)
 {
     for (int y=0; y<256; y++)
     {
-        if ( VideoMode == 6 || VideoMode == 6 )
+        if ( VideoMode == 6 || VideoMode == 7 )
         {
             // смещения в текстовом видеорежиме
             Scanlines[y].Offset = 64*(y/8);
@@ -516,7 +516,9 @@ void pixel_tables()
 
    if ((temp.rflags & (RF_DRIVER|RF_2X|RF_USEFONT))==(RF_DRIVER|RF_2X) && // render="double"
        (conf.mem_model == MM_ATM450 || conf.mem_model == MM_ATM710 || conf.mem_model == MM_ATM3 || conf.mem_model == MM_PROFI))
-      hires_sc_tables();
+  
+	hires_sc_tables();
+  
 }
 
 void video_color_tables()

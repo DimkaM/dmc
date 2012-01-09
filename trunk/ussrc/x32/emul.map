@@ -1,6 +1,6 @@
  emul
 
- Timestamp is 4f09f80e (Sun Jan 08 23:09:50 2012)
+ Timestamp is 4f0b4898 (Mon Jan 09 23:05:44 2012)
 
  Preferred load address is 00400000
 
@@ -23,17 +23,17 @@
  0002:00000468 00000004H .CRT$XTA                DATA
  0002:0000046c 00000004H .CRT$XTZ                DATA
  0002:00000470 00040127H .rdata                  DATA
- 0002:00040598 00000037H .rdata$debug            DATA
- 0002:000405d0 00000004H .rtc$IAA                DATA
- 0002:000405d4 00000004H .rtc$IZZ                DATA
- 0002:000405d8 00000004H .rtc$TAA                DATA
- 0002:000405dc 00000004H .rtc$TZZ                DATA
- 0002:000405e0 00000a64H .xdata$x                DATA
- 0002:00041044 000000dcH .idata$2                DATA
- 0002:00041120 00000014H .idata$3                DATA
- 0002:00041134 00000400H .idata$4                DATA
- 0002:00041534 00001204H .idata$6                DATA
- 0002:00042738 00000000H .edata                  DATA
+ 0002:00040598 0000003aH .rdata$debug            DATA
+ 0002:000405d4 00000004H .rtc$IAA                DATA
+ 0002:000405d8 00000004H .rtc$IZZ                DATA
+ 0002:000405dc 00000004H .rtc$TAA                DATA
+ 0002:000405e0 00000004H .rtc$TZZ                DATA
+ 0002:000405e8 00000a64H .xdata$x                DATA
+ 0002:0004104c 000000dcH .idata$2                DATA
+ 0002:00041128 00000014H .idata$3                DATA
+ 0002:0004113c 00000400H .idata$4                DATA
+ 0002:0004153c 00001204H .idata$6                DATA
+ 0002:00042740 00000000H .edata                  DATA
  0003:00000000 0002e8b4H .data                   DATA
  0003:0002f000 00f8c184H .bss                    DATA
  0004:00000000 000008e0H .rsrc$01                DATA
@@ -441,8 +441,8 @@
  0001:00011007       _strncmp                   00412007 f   LIBCMT:strncmp.obj
  0001:00011289       _mainCRTStartup            00412289 f   LIBCMT:crt0.obj
  0001:00011293       _wcslen                    00412293 f   LIBCMT:wcslen.obj
- 0001:000112b0       __chkstk                   004122b0 f   LIBCMT:chkstk.obj
  0001:000112b0       __alloca_probe             004122b0     LIBCMT:chkstk.obj
+ 0001:000112b0       __chkstk                   004122b0 f   LIBCMT:chkstk.obj
  0001:000112db       ___report_gsfailure        004122db f   LIBCMT:gs_report.obj
  0001:000113e1       __stbuf                    004123e1 f   LIBCMT:_sftbuf.obj
  0001:0001147d       __ftbuf                    0041247d f   LIBCMT:_sftbuf.obj
@@ -773,8 +773,8 @@
  0001:00023a5a       _mbtowc                    00424a5a f   LIBCMT:mbtowc.obj
  0001:00023a80       __allmul                   00424a80 f   LIBCMT:llmul.obj
  0001:00023ab4       __getbuf                   00424ab4 f   LIBCMT:_getbuf.obj
- 0001:0002421c       _open                      0042521c f   LIBCMT:open.obj
  0001:0002421c       __open                     0042521c f   LIBCMT:open.obj
+ 0001:0002421c       _open                      0042521c f   LIBCMT:open.obj
  0001:000242d2       __sopen_helper             004252d2 f   LIBCMT:open.obj
  0001:0002439e       __sopen                    0042539e f   LIBCMT:open.obj
  0001:000243d0       __sopen_s                  004253d0 f   LIBCMT:open.obj
@@ -907,8 +907,8 @@
  0001:0002c484       __isindst                  0042d484 f   LIBCMT:tzset.obj
  0001:0002c4c5       ___ascii_stricmp           0042d4c5 f   LIBCMT:stricmp.obj
  0001:0002c4fe       __stricmp_l                0042d4fe f   LIBCMT:stricmp.obj
- 0001:0002c5d3       _stricmp                   0042d5d3 f   LIBCMT:stricmp.obj
  0001:0002c5d3       __stricmp                  0042d5d3 f   LIBCMT:stricmp.obj
+ 0001:0002c5d3       _stricmp                   0042d5d3 f   LIBCMT:stricmp.obj
  0001:0002c702       __itoa_s                   0042d702 f   LIBCMT:xtoas.obj
  0001:0002c72c       __ltoa_s                   0042d72c f   LIBCMT:xtoas.obj
  0001:0002c753       __ultoa_s                  0042d753 f   LIBCMT:xtoas.obj
@@ -1083,8 +1083,8 @@
  0001:0002e0c9       __strlwr_s_l               0042f0c9 f   LIBCMT:strlwr.obj
  0001:0002e0fd       __strlwr_s                 0042f0fd f   LIBCMT:strlwr.obj
  0001:0002e114       __strlwr_l                 0042f114 f   LIBCMT:strlwr.obj
- 0001:0002e12e       __strlwr                   0042f12e f   LIBCMT:strlwr.obj
  0001:0002e12e       _strlwr                    0042f12e f   LIBCMT:strlwr.obj
+ 0001:0002e12e       __strlwr                   0042f12e f   LIBCMT:strlwr.obj
  0001:0002e193       __ungetch_nolock           0042f193 f   LIBCMT:getch.obj
  0001:0002e1ba       __getextendedkeycode       0042f1ba f   LIBCMT:getch.obj
  0001:0002e26d       __getch_nolock             0042f26d f   LIBCMT:getch.obj
@@ -2409,10 +2409,10 @@
  0001:0005bc40       ?r_profi_8@@YAXPAEI0@Z     0045cc40 f   dxr_prof.obj
  0001:0005bca0       ?rend_profi@@YAXPAEI@Z     0045cca0 f   dxr_prof.obj
  0001:0005bdc0       ?line_atm7_32@@YAXPAE0PAI0H@Z 0045cdc0 f   dxr_atm7.obj
- 0001:0005c010       ?line_atm7_16@@YAXPAE0PAI0H@Z 0045d010 f   dxr_atm7.obj
- 0001:0005c330       ?line_atm7_8@@YAXPAE0PAI0H@Z 0045d330 f   dxr_atm7.obj
- 0001:0005c560       ?rend_atm7@@YAXPAEIHH@Z    0045d560 f   dxr_atm7.obj
- 0001:0005c740       ?line_atm6_32@@YAXPAE0PAI0H@Z 0045d740 f   dxr_atm6.obj
+ 0001:0005c020       ?line_atm7_16@@YAXPAE0PAI0H@Z 0045d020 f   dxr_atm7.obj
+ 0001:0005c340       ?line_atm7_8@@YAXPAE0PAI0H@Z 0045d340 f   dxr_atm7.obj
+ 0001:0005c570       ?rend_atm7@@YAXPAEIHH@Z    0045d570 f   dxr_atm7.obj
+ 0001:0005c750       ?line_atm6_32@@YAXPAE0PAI0H@Z 0045d750 f   dxr_atm6.obj
  0001:0005c9a0       ?line_atm6_16@@YAXPAE0PAI0H@Z 0045d9a0 f   dxr_atm6.obj
  0001:0005ccc0       ?line_atm6_8@@YAXPAE0PAI0H@Z 0045dcc0 f   dxr_atm6.obj
  0001:0005cef0       ?rend_atm6@@YAXPAEIHH@Z    0045def0 f   dxr_atm6.obj
@@ -6642,22 +6642,22 @@
  0002:00040580       ??_C@_05DNEBIAHO@1?$CDINF?$AA@ 004d0580     LIBCMT:_x10fout_.obj
  0002:00040588       ??_C@_05PHHOCPM@1?$CDIND?$AA@ 004d0588     LIBCMT:_x10fout_.obj
  0002:00040590       ??_C@_06PGGFOGJG@1?$CDSNAN?$AA@ 004d0590     LIBCMT:_x10fout_.obj
- 0002:000405d0       ___rtc_iaa                 004d05d0     LIBCMT:_initsect_.obj
- 0002:000405d4       ___rtc_izz                 004d05d4     LIBCMT:_initsect_.obj
- 0002:000405d8       ___rtc_taa                 004d05d8     LIBCMT:_initsect_.obj
- 0002:000405dc       ___rtc_tzz                 004d05dc     LIBCMT:_initsect_.obj
- 0002:00041044       __IMPORT_DESCRIPTOR_DINPUT 004d1044     dinput:DINPUT.dll
- 0002:00041058       __IMPORT_DESCRIPTOR_DDRAW  004d1058     ddraw:DDRAW.dll
- 0002:0004106c       __IMPORT_DESCRIPTOR_DSOUND 004d106c     dsound:DSOUND.dll
- 0002:00041080       __IMPORT_DESCRIPTOR_USER32 004d1080     user32:USER32.dll
- 0002:00041094       __IMPORT_DESCRIPTOR_GDI32  004d1094     gdi32:GDI32.dll
- 0002:000410a8       __IMPORT_DESCRIPTOR_SHELL32 004d10a8     shell32:SHELL32.dll
- 0002:000410bc       __IMPORT_DESCRIPTOR_WINMM  004d10bc     winmm:WINMM.dll
- 0002:000410d0       __IMPORT_DESCRIPTOR_COMDLG32 004d10d0     comdlg32:COMDLG32.dll
- 0002:000410e4       __IMPORT_DESCRIPTOR_COMCTL32 004d10e4     comctl32:COMCTL32.dll
- 0002:000410f8       __IMPORT_DESCRIPTOR_SETUPAPI 004d10f8     setupapi:SETUPAPI.dll
- 0002:0004110c       __IMPORT_DESCRIPTOR_KERNEL32 004d110c     kernel32:KERNEL32.dll
- 0002:00041120       __NULL_IMPORT_DESCRIPTOR   004d1120     dinput:DINPUT.dll
+ 0002:000405d4       ___rtc_iaa                 004d05d4     LIBCMT:_initsect_.obj
+ 0002:000405d8       ___rtc_izz                 004d05d8     LIBCMT:_initsect_.obj
+ 0002:000405dc       ___rtc_taa                 004d05dc     LIBCMT:_initsect_.obj
+ 0002:000405e0       ___rtc_tzz                 004d05e0     LIBCMT:_initsect_.obj
+ 0002:0004104c       __IMPORT_DESCRIPTOR_DINPUT 004d104c     dinput:DINPUT.dll
+ 0002:00041060       __IMPORT_DESCRIPTOR_DDRAW  004d1060     ddraw:DDRAW.dll
+ 0002:00041074       __IMPORT_DESCRIPTOR_DSOUND 004d1074     dsound:DSOUND.dll
+ 0002:00041088       __IMPORT_DESCRIPTOR_USER32 004d1088     user32:USER32.dll
+ 0002:0004109c       __IMPORT_DESCRIPTOR_GDI32  004d109c     gdi32:GDI32.dll
+ 0002:000410b0       __IMPORT_DESCRIPTOR_SHELL32 004d10b0     shell32:SHELL32.dll
+ 0002:000410c4       __IMPORT_DESCRIPTOR_WINMM  004d10c4     winmm:WINMM.dll
+ 0002:000410d8       __IMPORT_DESCRIPTOR_COMDLG32 004d10d8     comdlg32:COMDLG32.dll
+ 0002:000410ec       __IMPORT_DESCRIPTOR_COMCTL32 004d10ec     comctl32:COMCTL32.dll
+ 0002:00041100       __IMPORT_DESCRIPTOR_SETUPAPI 004d1100     setupapi:SETUPAPI.dll
+ 0002:00041114       __IMPORT_DESCRIPTOR_KERNEL32 004d1114     kernel32:KERNEL32.dll
+ 0002:00041128       __NULL_IMPORT_DESCRIPTOR   004d1128     dinput:DINPUT.dll
  0003:00001330       _CLSID_XACTEngine          004d4330     dxguid:dxguid.obj
  0003:00001340       _CLSID_XACTAuditionEngine  004d4340     dxguid:dxguid.obj
  0003:00001350       _CLSID_XACTDebugEngine     004d4350     dxguid:dxguid.obj
@@ -6854,7 +6854,7 @@
  0003:0002f994       __commode                  00502994     LIBCMT:ncommode.obj
  0003:0002f99c       ___lconv_static_null       0050299c     LIBCMT:lconv.obj
  0003:0002fa70       __fmode                    00502a70     LIBCMT:txtmode.obj
- 0003:00030000       ___@@_PchSym_@00@UkilqvxghUfhhixUhgwOlyq@ 00503000     std.obj
+ 0003:00030000       ___@@_PchSym_@00@UacUkilqvxghUfhhixUhgwOlyq@ 00503000     std.obj
  0003:00030004       ?load_errors@@3DA          00503004     config.obj
  0003:00030005       ?dgb_extval@@3EA           00503005     debug.obj
  0003:00030006       ?mem_dump@@3EA             00503006     debug.obj
