@@ -6,17 +6,12 @@
 #include "dxr_atmf.h"
 #include "dxr_atm6.h"
 #include "fontatm2.h"
-/*
+
 const int text0_ofs = 0x0;
 const int text1_ofs = 0x2000;
 const int text2_ofs = -4*int(PAGE)+1;
 const int text3_ofs = -4*int(PAGE)+0x2000;
-*/
 
-const int text0_ofs = 3*int(PAGE)+0x0;
-const int text1_ofs = 3*int(PAGE)+0x1000;
-const int text2_ofs = 3*int(PAGE)+0x2001;
-const int text3_ofs = 3*int(PAGE)+0x3000;
 
 void line_atm6_8(unsigned char *dst, unsigned char *src, unsigned *tab0, unsigned char *font, int src_offset)
 {

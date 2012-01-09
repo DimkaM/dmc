@@ -12,7 +12,7 @@
 settxtmode
 	ld bc,0xff77
 	;if TEXTMODE
-	ld a,0x26
+	ld a,0x27
 	;else
 	;ld a,0x26
 	;endif
