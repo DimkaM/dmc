@@ -11,11 +11,11 @@
 
 settxtmode
 	ld bc,0xff77
-	if TEXTMODE
-	ld a,0x27
-	else
+	;if TEXTMODE
 	ld a,0x26
-	endif
+	;else
+	;ld a,0x26
+	;endif
 	out (c),a
 	MEM_TBUF
 	ld hl,0xc002
