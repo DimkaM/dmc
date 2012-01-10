@@ -66,13 +66,6 @@ void rend_atm_2_small(unsigned char *dst, unsigned pitch)
         return;
     }
 
-//    if ( 7 == (comp.pFF77 & 7) ) //< Undocumented Sinclair Textmode VideoMode
- //   {
-//        rend_atm7_small(dst, pitch);
-//        return;
-//    }
-//DimkaM
-
     if (temp.oy > temp.scy && conf.fast_sl) 
         pitch *= 2;
     rend_atm_frame_small(dst, pitch);
@@ -85,14 +78,6 @@ void rend_atm_2_small(unsigned char *dst, unsigned pitch)
         case 0: //< EGA 320x200
             rend_atm0_small(dst, pitch, y, Scanline.Offset);
             break;
-/* 640x200
-        case 2: // Hardware Multicolor
-            rend_atm2(dst, pitch, y, Scanline.Offset);
-            break;
-        case 6: //< Textmode
-            rend_atm6(dst, pitch, y, Scanline.Offset);
-            break;
-*/
         }
     }
 }
@@ -110,13 +95,6 @@ void rend_atm_2(unsigned char *dst, unsigned pitch)
         rend_dbl(dst, pitch);
         return;
     }
-
-//    if ( 7 == (comp.pFF77 & 7) ) //< Undocumented Sinclair Textmode VideoMode
-//    {
-//        rend_atm7(dst, pitch);
-//        return;
-//    }
-//DimkaM
 
     
     if (temp.oy > temp.scy && conf.fast_sl) 
