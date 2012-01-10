@@ -179,7 +179,7 @@ void z80loop()
       }
 
       if (cpu.int_pend && cpu.iff1 && cpu.t != cpu.eipos && // int enabled in CPU not issued after EI
-           !((conf.mem_model == MM_ATM710 || conf.mem_model == MM_ATM3) && !(comp.pFF77 & 0x20))) // int enabled by ATM hardware
+           !((conf.mem_model == MM_ATM710) && !(comp.pFF77 & 0x20))) // int enabled by ATM hardware
       {
          handle_int(&cpu, cpu.IntVec()); // Начало обработки int (запись в стек адреса возврата и т.п.)
       }
