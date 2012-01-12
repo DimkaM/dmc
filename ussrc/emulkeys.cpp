@@ -310,7 +310,10 @@ void main_nmidos()
  m_nmi(RM_DOS);
 }
 
-void main_nmicache() { m_nmi(RM_CACHE); }
+void main_nmicache() 
+   {
+   m_nmi(RM_CACHE); 
+   }
 
 static void qsave(const char *fname) {
    char xx[0x200]; addpath(xx, fname);

@@ -35,8 +35,11 @@ void out(unsigned port, unsigned char val)
    #endif
 
    // z-controller
-   if (conf.zc && (port & 0xFF) == 0x57)
+   if (conf.zc && (port & 0xFF) == 0x57 )
    {
+      if ((port & 0x80FF) == 0x8057 && conf.mem_model == MM_ATM3 
+         &&(comp.flags & CF_DOSPORTS)) 
+         return;
        Zc.Wr(port, val);
        return;
    }
@@ -637,9 +640,14 @@ __inline unsigned char in1(unsigned port)
        return in_gs(port);
    #endif
 
+
    // z-controller
    if (conf.zc && (port & 0xFF) == 0x57)
+   {
+      if ((port & 0x80FF) == 0x8057 && conf.mem_model == MM_ATM3 
+         &&(comp.flags & CF_DOSPORTS)) return (unsigned char)0xFF;
        return Zc.Rd(port);
+   }
 
    if(conf.mem_model == MM_ATM3)
    {

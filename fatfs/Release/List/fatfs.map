@@ -2,27 +2,18 @@
 #                                                                              #
 #      IAR Universal Linker V4.52D/WIN                                         #
 #                                                                              #
-#           Link time     =  15/Nov/2011  18:38:43                             #
+#           Link time     =  11/Jan/2012  15:47:51                             #
 #           Target CPU    =  Z80/64180                                         #
-#           List file     =  C:\Users\DimkaM\Documents\projects\fatfs\Release\ #
-#                            List\fatfs.map                                    #
-#           Output file 1 =  C:\Users\DimkaM\Documents\projects\fatfs\Release\ #
-#                            Exe\fatfs.raw                                     #
+#           List file     =  I:\zx\projects\fatfs\Release\List\fatfs.map       #
+#           Output file 1 =  I:\zx\projects\fatfs\Release\Exe\fatfs.raw        #
 #                            Format: simple                                    #
-#           Command line  =  C:\Users\DimkaM\Documents\projects\fatfs\Release\ #
-#                            Obj\diskio.r01                                    #
-#                            C:\Users\DimkaM\Documents\projects\fatfs\Release\ #
-#                            Obj\ff.r01                                        #
-#                            C:\Users\DimkaM\Documents\projects\fatfs\Release\ #
-#                            Obj\mylib.r01                                     #
-#                            C:\Users\DimkaM\Documents\projects\fatfs\Release\ #
-#                            Obj\savelij.r01                                   #
-#                            -o                                                #
-#                            C:\Users\DimkaM\Documents\projects\fatfs\Release\ #
-#                            Exe\fatfs.raw                                     #
+#           Command line  =  I:\zx\projects\fatfs\Release\Obj\diskio.r01       #
+#                            I:\zx\projects\fatfs\Release\Obj\ff.r01           #
+#                            I:\zx\projects\fatfs\Release\Obj\mylib.r01        #
+#                            I:\zx\projects\fatfs\Release\Obj\savelij.r01 -o   #
+#                            I:\zx\projects\fatfs\Release\Exe\fatfs.raw        #
 #                            -Fsimple -l                                       #
-#                            C:\Users\DimkaM\Documents\projects\fatfs\Release\ #
-#                            List\fatfs.map                                    #
+#                            I:\zx\projects\fatfs\Release\List\fatfs.map       #
 #                            -xes "-IC:\Program Files\IAR ewz80\z80\LIB\" -f   #
 #                            C:\Users\DimkaM\Documents\projects\fatfs\Lnkz80.x #
 #                            cl                                                #
@@ -56,9 +47,9 @@
                 *                                      *
                 ****************************************
 
-diskio ( C:\Users\DimkaM\Documents\projects\fatfs\Release\Obj\diskio.r01 )
+diskio ( I:\zx\projects\fatfs\Release\Obj\diskio.r01 )
   disk_ioctl                                 4303 
-ff ( C:\Users\DimkaM\Documents\projects\fatfs\Release\Obj\ff.r01 )
+ff ( I:\zx\projects\fatfs\Release\Obj\ff.r01 )
   clust2sect                                 4542 
   f_chdir                                    691A 
   f_chdrive                                  6907 
@@ -81,11 +72,11 @@ ff ( C:\Users\DimkaM\Documents\projects\fatfs\Release\Obj\ff.r01 )
   f_write                                    649D 
   get_fat                                    45BF 
   put_fat                                    478E 
-mylib ( C:\Users\DimkaM\Documents\projects\fatfs\Release\Obj\mylib.r01 )
+mylib ( I:\zx\projects\fatfs\Release\Obj\mylib.r01 )
   tablcall                                   4000 
   LD_CLUST                                   4028 
   get_fattime                                4054 
-SAVELIJ ( C:\Users\DimkaM\Documents\projects\fatfs\Release\Obj\savelij.r01 )
+SAVELIJ ( I:\zx\projects\fatfs\Release\Obj\savelij.r01 )
   disk_initialize                            7A65 
   disk_read                                  7AB6 
   disk_write                                 7AD3 

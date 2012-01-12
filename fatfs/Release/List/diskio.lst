@@ -2,22 +2,20 @@
 #                                                                            #
 # IAR Z80/64180 C-Compiler V4.06A/WIN                                        #
 #                                                                            #
-#       Compile time  =  15/Nov/2011  18:38:39                               #
+#       Compile time  =  11/Jan/2012  15:47:47                               #
 #       Target option =  Z80                                                 #
 #       Memory model  =  large                                               #
-#       Source file   =  c:\users\dimkam\documents\projects\fatfs\diskio.c   #
-#       List file     =  c:\users\dimkam\documents\projects\fatfs\release\list\diskio.lst#
-#       Object file   =  c:\users\dimkam\documents\projects\fatfs\release\obj\diskio.r01#
-#       ASM file      =  c:\users\dimkam\documents\projects\fatfs\release\list\diskio.s01#
-#       Command line  =  -v0 -ml -uua                                        #
-#                        -OC:\Users\DimkaM\Documents\projects\fatfs\Release\Obj\ #
+#       Source file   =  i:\zx\projects\fatfs\diskio.c                       #
+#       List file     =  i:\zx\projects\fatfs\release\list\diskio.lst        #
+#       Object file   =  i:\zx\projects\fatfs\release\obj\diskio.r01         #
+#       ASM file      =  i:\zx\projects\fatfs\release\list\diskio.s01        #
+#       Command line  =  -v0 -ml -uua -OI:\zx\projects\fatfs\Release\Obj\    #
 #                        -e -c -K -gA -z9 -RCODE                             #
-#                        -LC:\Users\DimkaM\Documents\projects\fatfs\Release\List\ #
-#                        -q -T -t8                                           #
-#                        -AC:\Users\DimkaM\Documents\projects\fatfs\Release\List\ #
-#                        -NC:\Users\DimkaM\Documents\projects\fatfs\Release\List\ #
-#                        -X -IC:\Program Files\IAR ewz80\z80\inc\            #
-#                        C:\Users\DimkaM\Documents\projects\fatfs\diskio.c   #
+#                        -LI:\zx\projects\fatfs\Release\List\ -q -T -t8      #
+#                        -AI:\zx\projects\fatfs\Release\List\                #
+#                        -NI:\zx\projects\fatfs\Release\List\ -X             #
+#                        -IC:\Program Files\IAR ewz80\z80\inc\               #
+#                        I:\zx\projects\fatfs\diskio.c                       #
 #                                                                            #
 #                           Copyright 2001 IAR Systems. All rights reserved. #
 ##############################################################################
@@ -25,9 +23,9 @@
 
 }
 ^
-"c:\users\dimkam\documents\projects\fatfs\diskio.c",8  Warning[33]: Local or formal 'c' was never referenced
-"c:\users\dimkam\documents\projects\fatfs\diskio.c",8  Warning[33]: Local or formal 'b' was never referenced
-"c:\users\dimkam\documents\projects\fatfs\diskio.c",8  Warning[33]: Local or formal 'a' was never referenced
+"i:\zx\projects\fatfs\diskio.c",8  Warning[33]: Local or formal 'c' was never referenced
+"i:\zx\projects\fatfs\diskio.c",8  Warning[33]: Local or formal 'b' was never referenced
+"i:\zx\projects\fatfs\diskio.c",8  Warning[33]: Local or formal 'a' was never referenced
    \   0000                    NAME    diskio(16)
    \   0000                    RSEG    CODE(0)
    \   0000                    PUBLIC  disk_ioctl

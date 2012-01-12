@@ -1,18 +1,16 @@
 ###############################################################################
 #                                                                             #
-#     IAR Systems Z80/64180 Assembler V4.06A/WIN 15/Nov/2011  18:38:43        #
+#     IAR Systems Z80/64180 Assembler V4.06A/WIN 11/Jan/2012  15:47:51        #
 #     Copyright 2001 IAR Systems. All rights reserved.                        #
 #                                                                             #
 #           Target option =  z80                                              #
-#           Source file   =  C:\Users\DimkaM\Documents\projects\fatfs\mylib.asm#
-#           List file     =  C:\Users\DimkaM\Documents\projects\fatfs\Release\List\mylib.lst#
-#           Object file   =  C:\Users\DimkaM\Documents\projects\fatfs\Release\Obj\mylib.r01#
-#           Command line  =  -v0 -uu                                          #
-#                            -OC:\Users\DimkaM\Documents\projects\fatfs\Release\Obj\ #
-#                            -s+ -M<> -w+                                     #
-#                            -LC:\Users\DimkaM\Documents\projects\fatfs\Release\List\ #
+#           Source file   =  I:\zx\projects\fatfs\mylib.asm                   #
+#           List file     =  I:\zx\projects\fatfs\Release\List\mylib.lst      #
+#           Object file   =  I:\zx\projects\fatfs\Release\Obj\mylib.r01       #
+#           Command line  =  -v0 -uu -OI:\zx\projects\fatfs\Release\Obj\ -s+  #
+#                            -M<> -w+ -LI:\zx\projects\fatfs\Release\List\    #
 #                            -T -t8 -IC:\Program Files\IAR ewz80\z80\inc\     #
-#                            C:\Users\DimkaM\Documents\projects\fatfs\mylib.asm #
+#                            I:\zx\projects\fatfs\mylib.asm                   #
 #                                                                             #
 ###############################################################################
 
@@ -164,7 +162,7 @@
     146    0000B6          
     147    0000B6          ENDMOD
 ##############################
-#          CRC:8207          #
+#          CRC:BD04          #
 #        Errors:   0         #
 #        Warnings: 0         #
 #         Bytes: 182         #
@@ -173,7 +171,7 @@
 
 
 ##############################
-#          CRC:8207          #
+#          CRC:BD04          #
 #        Errors:   0         #
 #        Warnings: 0         #
 #         Bytes: 182         #
