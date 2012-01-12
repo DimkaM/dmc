@@ -146,6 +146,7 @@ about
 	byte " Deathsoft,TS-Labs",0
 	
 mkdir
+   display $
 	CALL txt.cursor_v
 	MEM_SET inpstr,' ',12
 	xor a
@@ -308,7 +309,6 @@ cursdw
 	jp mainloop
 
 cursleft
-	display $
 	CALL txt.cursor_v
 	ld e,(ix+txt.WIN.cy)
 .l1	call get_fno.prev
@@ -382,7 +382,7 @@ readfnos				;de=dir
 	ld a,(ix+txt.FWIN.pages)
 	ld b,high mem.b2
 	out (c),a
-	MEM_HIDE
+	;MEM_HIDE
 	
 	ld a,(ix+txt.FWIN.drive):add a,0x30:ld (curdir),a
 	WIN_GETPAGES a
@@ -402,18 +402,18 @@ readfnos				;de=dir
 .cat	ld (bc),a
 	ld d,b,e,c
 	push bc
-	MEM_UNHIDE
+	;MEM_UNHIDE
 	ld iy,0xfff8:add iy,bc ;-8+bc
 	call fno_sort
-	MEM_HIDE
+	;MEM_HIDE
 	pop bc
 	ADDBC8 0x18
 	bit 6,b:jr z,.l1
 	ld hl,.num:inc (hl)
-	MEM_UNHIDE
+	;MEM_UNHIDE
 	ld bc,mem.b2:ld a,(hl)
 	out (c),a
-	MEM_HIDE
+	;MEM_HIDE
 	ld bc,0x8000
 	jr .l1
 .num	word 0

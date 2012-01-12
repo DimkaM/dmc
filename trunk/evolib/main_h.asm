@@ -77,13 +77,7 @@
 main_p=0x18^0xff
 fat_p=0x19^0xff
 
-	if TEXTMODE
 txt_p=8^0xff
-	else
-txt_p=5^0xff
-	endif
-
-attr_p=1^0xff
 tbuf=0x17^0xff
 fbuf=0x1a^0xff
 lfno1=0xBF^0xff
@@ -124,11 +118,6 @@ setscr
 	ld a,txt_p
 	ld bc,b1
 	out (c),a
-	IFN TEXTMODE
-	ld a,attr_p
-	ld b,high b2
-	out (c),a
-	ENDIF
 	ret
 	
 setfat
@@ -136,7 +125,7 @@ setfat
 	ld a,fat_p
 	ld bc,b1
 	out (c),a
-	MEM_HIDE
+	;MEM_HIDE
 	ret
 	
 	endmodule

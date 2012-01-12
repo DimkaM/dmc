@@ -11,11 +11,7 @@
 
 settxtmode
 	ld bc,0xff77
-	;if TEXTMODE
 	ld a,0x07
-	;else
-	;ld a,0x26
-	;endif
 	out (c),a
 	MEM_TBUF
 	ld hl,0xc002
@@ -89,13 +85,8 @@ printat		;печать с позиции hl
 	jr .l1
 	
 xy2scr			;input hl=xy
-	if TEXTMODE
 	ld a,0x1c
 	srl h:rr a:rr a
-	else
-	ld a,0x0e
-	srl h:rr a
-	endif
 	add a,l
 	ld l,h
 	ld h,a
@@ -110,17 +101,10 @@ xy2scr			;input hl=xy
 	ret
 	
 xy2attr
-	if TEXTMODE
 	ld a,0xc7
 	srl h
 	jr nc,.l1
 	ld a,0x87
-	else
-	ld a,0x87
-	srl h
-	jr nc,.l1
-	ld a,0x07
-	endif
 	inc h
 .l1	add a,l
 	ld l,h
@@ -132,11 +116,7 @@ xy2attr
 	rr a
 	add a,l
 	ld l,a
-	if TEXTMODE
 	set 6,h
-	else
-	set 7,h
-	endif
 	ret
 	
 cursor

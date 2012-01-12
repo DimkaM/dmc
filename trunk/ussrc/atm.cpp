@@ -282,7 +282,6 @@ void set_atm_FF77(unsigned port, unsigned char val)
    if(conf.mem_model!=MM_ATM3)
        cpu.int_gate = (comp.pFF77 & 0x20) != false;
    else cpu.int_gate = true;
-   //printf("Int_gate: %d \n",cpu.int_gate);
    set_banks();
 }
 

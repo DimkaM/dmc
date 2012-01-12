@@ -1,6 +1,5 @@
 	DEVICE ZXSPECTRUM128
 
-TEXTMODE=1
 MEM_FREE=0x3000
 	ORG #0
 START
@@ -31,12 +30,12 @@ rst18
 	POP HL,DE,BC,AF
 	ei
 	ret
-	;org 0x0100
+
 	INCLUDE "main_h.asm"
 
 INI_CONT
 	ld a,1
-	out	(#BF),a
+	out (#BF),a
 	ld a,0x7f&mem.main_p
 	LD BC,#3FF7
 	out (c),a
@@ -52,14 +51,14 @@ INI_CONT
 	ld a,0x7f&mem.txt_p
 	OUT (C),A
 	LD BC,0xbff7
-	ld a,0x7f&mem.attr_p
+	ld a,0x7f&mem.txt_p
 	OUT (C),A
 	LD BC,#fff7
-	ld a,0x7f&mem.fat_p
+	ld a,0x7f&mem.txt_p
 	OUT (C),A
 	LD SP,#4000
 	ld a,0
-	out	(#BF),a	
+	out (#BF),a	
 	call SAMPLE.begin
 .l2	inc hl
 	halt
