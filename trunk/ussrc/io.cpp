@@ -123,6 +123,25 @@ void out(unsigned port, unsigned char val)
           comp.wd_shadow[(p1 >> 5) - 1] = val;
       }
 
+      if (!(port & 6) && (conf.ide_scheme == IDE_NEMO || conf.ide_scheme == IDE_NEMO_A8)&&conf.mem_model == MM_ATM3)
+      {
+            unsigned hi_byte = (conf.ide_scheme == IDE_NEMO)? (port & 1) : (port & 0x100);
+             if (hi_byte)
+             {
+                 comp.ide_write = val;
+                 return;
+             }
+             if ((port & 0x18) == 0x08)
+             {
+                 if ((port & 0xE0) == 0xC0)
+                     hdd.write(8, val);
+                 return;
+             } // CS1=0,CS0=1,reg=6
+             if ((port & 0x18) != 0x10)
+                 return; // invalid CS0,CS1
+             goto write_hdd_5;
+      }
+
       if (conf.ide_scheme == IDE_ATM && (port & 0x1F) == 0x0F)
       {
          if (port & 0x100) { comp.ide_write = val; return; }
@@ -208,6 +227,7 @@ void out(unsigned port, unsigned char val)
 
          if ((p1 & 0x9F) == 0x9F && !(comp.aFF77 & 0x4000))
              atm_writepal(val); // don't return - write to TR-DOS system port
+
       }
 
       if(conf.mem_model == MM_PROFI)
@@ -306,6 +326,7 @@ void out(unsigned port, unsigned char val)
           comp.wd.out(p1, val);
           return;
       }
+      
       // don't return - out to port #FE works in trdos!
    }
    else // не dos
@@ -736,6 +757,20 @@ __inline unsigned char in1(unsigned port)
           // 8F = 100|01111b
           return comp.wd_shadow[(p1 >> 5) - 1];
       }
+
+      if (!(port & 6) && (conf.ide_scheme == IDE_NEMO || conf.ide_scheme == IDE_NEMO_A8)&&conf.mem_model == MM_ATM3 )
+       {
+          unsigned hi_byte = (conf.ide_scheme == IDE_NEMO)? (port & 1) : (port & 0x100);
+          if(hi_byte)
+              return comp.ide_read;
+          comp.ide_read = 0xFF;
+          if((port & 0x18) == 0x08)
+              return ((port & 0xE0) == 0xC0)? hdd.read(8) : 0xFF; // CS1=0,CS0=1,reg=6
+          if((port & 0x18) != 0x10)
+              return 0xFF; // invalid CS0,CS1
+          goto read_hdd_5;
+       }
+
 
       if (conf.ide_scheme == IDE_ATM && (port & 0x1F) == 0x0F)
       {
