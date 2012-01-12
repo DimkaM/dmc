@@ -13,3 +13,5 @@ nmake clean
 nmake all SSE2=1 RELEASE=1 USE_CL=1
 
 pause
+
+del_obj.bat

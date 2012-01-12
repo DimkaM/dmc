@@ -375,7 +375,7 @@ printerr
 .werr	txt.WIN 9,9,60,5,0,0,0x17
 
 readfnos				;de=dir
-	MEM_UNHIDE
+	;MEM_UNHIDE
 	ld a,mem.fat_p
 	ld bc,mem.b1
 	out (c),a
