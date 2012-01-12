@@ -48,7 +48,6 @@ tablcall:
   DEFW f_chdir
 //VolToPart:
 //        DEFB 0,0,1,0
-  DEFW ?L_MUL_L03 
 
 LD_CLUST:
   LD HL,20
@@ -80,9 +79,9 @@ minmes
     ld (hl),d
     ret
 bcd2bin
-    ld b,0xdf
+    ld b,0xde
     out (c),a
-    ld b,0xbf
+    ld b,0xbe
     in a,(c)
     ret
     
@@ -90,15 +89,15 @@ get_fattime:
     push bc
     push de
     ex de,hl
-    ld bc,0x0bbe
-    in a,(c)
-    ld bc,0xeff7
-    or 0x80
-    out (c),a
+    //ld bc,0x0bbe
+    //in a,(c)
+    //ld bc,0xeff7
+    //or 0x80
+    //out (c),a
     ld a,0x0b
-    ld b,0xdf
+    ld bc,0xdef7
     out (c),a
-    ld b,0xbf
+    ld b,0xbe
     in a,(c)
     or 0x04
     out (c),a
@@ -134,11 +133,11 @@ get_fattime:
     sla a
     add a,(hl)
     ld (hl),a 
-    ld bc,0x0bbe
-    in a,(c)
-    ld bc,0xeff7
-    xor 0x80
-    out (c),a
+    //ld bc,0x0bbe
+    //in a,(c)
+    //ld bc,0xeff7
+    //xor 0x80
+    //out (c),a
     pop de
     pop bc
     ret
