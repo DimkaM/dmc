@@ -79,8 +79,6 @@ b3=0xf7f7
 
 state	;состояние памяти
 .store	;сохраняем
-;	in a,(0xbf)
-;	ld (.shad+1),a
 	ld bc,0x05be
 	in a,(c):ld (.p1+1),a
 	inc b
@@ -89,7 +87,6 @@ state	;состояние памяти
 	in a,(c):ld (.p3+1),a
 	ret
 .rest	;восстанавливаем
-	;MEM_UNHIDE
 	ld bc,b1
 .p1	ld a,0
 	out (c),a
@@ -99,23 +96,18 @@ state	;состояние памяти
 	ld b,high b3
 .p3	ld a,0
 	out (c),a
-;.shad	ld a,0
-;	out (0xbf),a
-;	ret
+	ret
 
 setscr
-	;MEM_UNHIDE
 	ld a,txt_p
 	ld bc,b1
 	out (c),a
 	ret
 	
 setfat
-	;MEM_UNHIDE
 	ld a,fat_p
 	ld bc,b1
 	out (c),a
-	;MEM_HIDE
 	ret
 	
 	endmodule

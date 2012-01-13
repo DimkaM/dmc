@@ -41,8 +41,8 @@ mainloop
 	jp z,cursup
 	cp 0x0d
 	jp z,cursent
-	cp 0x20
-	jp z,mark
+	;cp 0x20
+	;jp z,mark
 	cp 0x31
 	jp z,about
 	cp 0x32
@@ -59,7 +59,6 @@ mainloop
 	
 mark
 	CALL txt.cursor_v
-	;MEM_TFF
 	call getfnocurs
 	DEC hl
 	ld a,0x10:and (hl):jp nz,mainloop
@@ -243,11 +242,9 @@ delete
 	
 rename
 	CALL txt.cursor_v
-	;MEM_FFF
 	call get_fno.name
 	ld a,'.':cp (hl):jp z,mainloop
 	push hl
-	;MEM_SCR
 	ld de,inpstr:xor a:ld (de),a
 	ld a,1
 	WIN_SET_CX A
