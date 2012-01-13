@@ -57,8 +57,6 @@ INI_CONT
 	ld a,0x7f&mem.txt_p
 	OUT (C),A
 	LD SP,#4000
-;	ld a,0
-;	out (#BF),a	
 	call SAMPLE.begin
 .l2	inc hl
 	halt
