@@ -2177,6 +2177,7 @@ FRESULT f_mount (
 		if (!ff_del_syncobj(rfs->sobj)) return FR_INT_ERR;
 #endif
 		rfs->fs_type = 0;			/* Clear old fs object */
+	        ds_m[rfs->drv]=0xff;   //DimkaM fix
 	}
 
 	if (fs) {
