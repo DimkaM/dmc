@@ -41,9 +41,10 @@ pr_flist
 .l3	LD d,(IX+txt.FWIN.poz+1)
 	ld a,FILINFO.FATTRIB:add (IX+txt.FWIN.poz):ld e,a
 	LD a,(IX+txt.FWIN.p_poz)
-	or a:jr z,.end
+.l1	or a:jr z,.end
 	ld bc,mem.b3:out (c),a
-.l1	push de
+   exa
+   push de
 	inc (ix+txt.FWIN.curss)
 	call txt.print
 	ld de,ok
@@ -54,8 +55,6 @@ pr_flist
 	ld hl,FILINFO.NEXT-FILINFO.FATTRIB:add hl,de
 	ld a,FILINFO.FATTRIB:add (hl):ld e,a
 	inc hl:ld d,(hl):inc hl:ld a,(hl)
-	or a:jr z,.end
-	ld bc,mem.b3:out (c),a
 	jr .l1
 .end
 	xor a
@@ -82,24 +81,24 @@ get_fno
 	ld (IX+txt.FWIN.p_poz),a
 	ld bc,mem.b3:out (c),a
 	ret
-getfnocurs
-	WIN_GET_CY l
-	ld h,0
-	ld e,(ix+txt.FWIN.poz)
-	ld d,(ix+txt.FWIN.poz+1)
-	add hl,de
-getfno
-	push bc
-	ld a,h:srl a:or (ix+txt.FWIN.pages)
-	ld (readfnos.num),a
-	ld bc,mem.b3
-	out (c),a
-	pop bc
-	ld a,h:and %00000001:ld h,a
-	add hl,hl,hl,hl,hl,hl,hl,hl,hl,hl
-	ld de,fnostart+FILINFO.FNAME
-	add hl,de
-	ret
+;getfnocurs
+;	WIN_GET_CY l
+;	ld h,0
+;	ld e,(ix+txt.FWIN.poz)
+;	ld d,(ix+txt.FWIN.poz+1)
+;	add hl,de
+;getfno
+;	push bc
+;	ld a,h:srl a:or (ix+txt.FWIN.pages)
+;	ld (readfnos.num),a
+;	ld bc,mem.b3
+;	out (c),a
+;	pop bc
+;	ld a,h:and %00000001:ld h,a
+;	add hl,hl,hl,hl,hl,hl,hl,hl,hl,hl
+;	ld de,fnostart+FILINFO.FNAME
+;	add hl,de
+;	ret
 FRESULT
 	dw .OK
 	dw .DISK_ERR
