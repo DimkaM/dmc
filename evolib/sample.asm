@@ -1,4 +1,4 @@
-	INCLUDE "text_h.asm"
+п»ї	INCLUDE "text_h.asm"
 	INCLUDE "samp_h.asm"
 
 
@@ -59,7 +59,7 @@ mainloop
 	
 mark
 	CALL txt.cursor_v
-	call getfnocurs
+	;call getfnocurs
 	DEC hl
 	ld a,0x10:and (hl):jp nz,mainloop
 	ld de,FILINFO.MARK-FILINFO.FATTRIB
@@ -145,7 +145,6 @@ about
 	byte " Deathsoft,TS-Labs",0
 	
 mkdir
-   display $
 	CALL txt.cursor_v
 	MEM_SET inpstr,' ',12
 	xor a
@@ -285,15 +284,21 @@ cursent
 .l2	call readfnos
 .l3	call pr_flist_new
 .l1	jp mainloop
-
 cursright
 	CALL txt.cursor_v
-	ld a,(ix+txt.WIN.h):sub (ix+txt.WIN.cy)
-	ld e,a
-.l1	dec e:jp m,cursdw.l1
-	call get_fno.next
-	jr z,cursdw.l1
-	jr .l1
+	ld d,(ix+txt.WIN.h):ld a,(ix+txt.WIN.cy)
+	inc a:sub d:ld d,a:jr nz,.l1
+	call pr_flist:ld a,0xe0:and l
+	ld (IX+txt.FWIN.poz+1),h
+	ld (IX+txt.FWIN.poz),a:exa
+	ld (IX+txt.FWIN.p_poz),a
+	ld a,(ix+txt.FWIN.curss)
+	dec a:ld (ix+txt.WIN.cy),a
+	jp mainloop
+.l1	call get_fno.next:jp z,mainloop
+	inc (ix+txt.WIN.cy)
+	inc d:jr nz,.l1
+	jp mainloop
 cursdw
 	CALL txt.cursor_v
 	call get_fno.next
@@ -306,12 +311,17 @@ cursdw
 	jp mainloop
 
 cursleft
+	display $
 	CALL txt.cursor_v
-	ld e,(ix+txt.WIN.cy)
+	xor a
+	or (ix+txt.WIN.cy):jr nz,.l1
+	ld a,(ix+txt.WIN.h):ld (ix+txt.WIN.cy),a
 .l1	call get_fno.prev
-	jr z,cursup.l1
-	dec e:jp m,cursup.l1
-	jr .l1
+	jr z,.l2
+	dec (ix+txt.WIN.cy):jp nz,.l1
+.l2	call pr_flist
+	jp mainloop
+	
 cursup
 	CALL txt.cursor_v
 	call get_fno.prev
@@ -438,41 +448,41 @@ fno_sort
 	ld bc,mem.b3:out (c),a
 	ld (.num),a
 	ld a,e:and %11100000
-	or FILINFO.FATTRIB:ld e,a ;взад на имя
+	or FILINFO.FATTRIB:ld e,a ;РІР·Р°Рґ РЅР° РёРјСЏ
 	jr .l3
-.new	;добавим после текущего
-	ld a,l:and %11100000:ld l,a	;смещение в ноль
-	push hl:ex (sp),ix			;в индексный
+.new	;РґРѕР±Р°РІРёРј РїРѕСЃР»Рµ С‚РµРєСѓС‰РµРіРѕ
+	ld a,l:and %11100000:ld l,a	;СЃРјРµС‰РµРЅРёРµ РІ РЅРѕР»СЊ
+	push hl:ex (sp),ix			;РІ РёРЅРґРµРєСЃРЅС‹Р№
 	push iy:pop de:set 6,d
 	xor a
-	ld (iy+FILINFO.NEXTP),a		;устанавливаем следующий фно zero
+	ld (iy+FILINFO.NEXTP),a		;СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј СЃР»РµРґСѓСЋС‰РёР№ С„РЅРѕ zero
 	ld a,(.num)
-	ld (iy+FILINFO.PREVP),a	;устанавливаем предыдущий
+	ld (iy+FILINFO.PREVP),a	;СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј РїСЂРµРґС‹РґСѓС‰РёР№
 	ld (iy+FILINFO.PREV),hl
-	ld (ix+FILINFO.NEXT),de		;устанавливаем следующий
+	ld (ix+FILINFO.NEXT),de		;СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј СЃР»РµРґСѓСЋС‰РёР№
 	ld a,(readfnos.num)
 	ld (ix+FILINFO.NEXTP),a		
 	pop ix:ret
 	
-.prev	;вставим перед текущим
-	ld a,l:and %11100000:ld l,a	;смещение в ноль
-	push hl:ex (sp),ix			;в индексный
+.prev	;РІСЃС‚Р°РІРёРј РїРµСЂРµРґ С‚РµРєСѓС‰РёРј
+	ld a,l:and %11100000:ld l,a	;СЃРјРµС‰РµРЅРёРµ РІ РЅРѕР»СЊ
+	push hl:ex (sp),ix			;РІ РёРЅРґРµРєСЃРЅС‹Р№
 	push iy:pop de:set 6,d
 	ld a,(.num)
 	ld (iy+FILINFO.NEXTP),a
-	ld (iy+FILINFO.NEXT),hl	;устанавливаем следующий фно
-	ld hl,(ix+FILINFO.PREV)		;берём предыдущий фно
-	ld (iy+FILINFO.PREV),hl		;устанавливаем предыдущий
-	ld (ix+FILINFO.PREV),de		;устанавливаем предыдущий
+	ld (iy+FILINFO.NEXT),hl	;СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј СЃР»РµРґСѓСЋС‰РёР№ С„РЅРѕ
+	ld hl,(ix+FILINFO.PREV)		;Р±РµСЂС‘Рј РїСЂРµРґС‹РґСѓС‰РёР№ С„РЅРѕ
+	ld (iy+FILINFO.PREV),hl		;СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј РїСЂРµРґС‹РґСѓС‰РёР№
+	ld (ix+FILINFO.PREV),de		;СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј РїСЂРµРґС‹РґСѓС‰РёР№
 	ld a,(readfnos.num):ld b,a
 	ld a,(ix+FILINFO.PREVP)
 	ld (ix+FILINFO.PREVP),b
 	ld (iy+FILINFO.PREVP),a
 	pop ix
-	or a:jr z,.firstfno	;если ноль то первый элемент списка
+	or a:jr z,.firstfno	;РµСЃР»Рё РЅРѕР»СЊ С‚Рѕ РїРµСЂРІС‹Р№ СЌР»РµРјРµРЅС‚ СЃРїРёСЃРєР°
 	ld bc,mem.b3:out (c),a
 	push hl:pop iy
-	ld (iy+FILINFO.NEXT),de	;установим следующим
+	ld (iy+FILINFO.NEXT),de	;СѓСЃС‚Р°РЅРѕРІРёРј СЃР»РµРґСѓСЋС‰РёРј
 	ld a,(readfnos.num)
 	ld (iy+FILINFO.NEXTP),a
 	ret
@@ -482,7 +492,7 @@ fno_sort
 	ld (iy+FILINFO.PREVP),a
 	ld (iy+FILINFO.NEXTP),a
 .firstfno
-	ld (ix+txt.FWIN.fno_1),de	;запомним первый элемент списка
+	ld (ix+txt.FWIN.fno_1),de	;Р·Р°РїРѕРјРЅРёРј РїРµСЂРІС‹Р№ СЌР»РµРјРµРЅС‚ СЃРїРёСЃРєР°
 	ld a,(readfnos.num)
 	ld (ix+txt.FWIN.p_fno_1),a
 	ret
@@ -492,56 +502,56 @@ fno_sort
 ; .NAMEBUF=MEM_FREE
 ; .NAMEBUF2=.NAMEBUF+13
 ; .FILE=.NAMEBUF2+33
-        ; LD HL,.FILE     ;описатель файла
+        ; LD HL,.FILE     ;РѕРїРёСЃР°С‚РµР»СЊ С„Р°Р№Р»Р°
         ; PUSH HL
-        ; LD HL,.NAMEBUF       ;имя файла
+        ; LD HL,.NAMEBUF       ;РёРјСЏ С„Р°Р№Р»Р°
         ; PUSH HL
-        ; LD HL,3             ;режим - открыть r/w
+        ; LD HL,3             ;СЂРµР¶РёРј - РѕС‚РєСЂС‹С‚СЊ r/w
         ; PUSH HL
-        ; CALL SET_FAT_PAGE   ;втыкаем стр. с фат
-        ; CALL FATFS.OPEN     ;откр. фыйл
-        ; POP BC,BC           ;снимаем со стека не нужное
-        ; LD HL,.NAMEBUF2      ;сюда грузим заголовок SNA
+        ; CALL SET_FAT_PAGE   ;РІС‚С‹РєР°РµРј СЃС‚СЂ. СЃ С„Р°С‚
+        ; CALL FATFS.OPEN     ;РѕС‚РєСЂ. С„С‹Р№Р»
+        ; POP BC,BC           ;СЃРЅРёРјР°РµРј СЃРѕ СЃС‚РµРєР° РЅРµ РЅСѓР¶РЅРѕРµ
+        ; LD HL,.NAMEBUF2      ;СЃСЋРґР° РіСЂСѓР·РёРј Р·Р°РіРѕР»РѕРІРѕРє SNA
         ; PUSH HL
-        ; LD HL,27            ;заголовок 27 байт
+        ; LD HL,27            ;Р·Р°РіРѕР»РѕРІРѕРє 27 Р±Р°Р№С‚
         ; PUSH HL
-        ; LD HL,.NAMEBUF2+31   ;тут вернётся кол-во
-        ; PUSH HL             ;прочитанных байт
-        ; CALL FATFS.READ     ;читаем
-        ; POP BC,BC,BC        ;снимем не нужное
-        ; LD D,5              ;будем грузить в пятую стр.
+        ; LD HL,.NAMEBUF2+31   ;С‚СѓС‚ РІРµСЂРЅС‘С‚СЃСЏ РєРѕР»-РІРѕ
+        ; PUSH HL             ;РїСЂРѕС‡РёС‚Р°РЅРЅС‹С… Р±Р°Р№С‚
+        ; CALL FATFS.READ     ;С‡РёС‚Р°РµРј
+        ; POP BC,BC,BC        ;СЃРЅРёРјРµРј РЅРµ РЅСѓР¶РЅРѕРµ
+        ; LD D,5              ;Р±СѓРґРµРј РіСЂСѓР·РёС‚СЊ РІ РїСЏС‚СѓСЋ СЃС‚СЂ.
         ; CALL LOAD4X4
-        ; LD D,2              ;и во вторую тоже
+        ; LD D,2              ;Рё РІРѕ РІС‚РѕСЂСѓСЋ С‚РѕР¶Рµ
         ; CALL LOAD4X4
-        ; LD D,0              ;а вот тут хер знает в какую
-        ; CALL LOAD4X4        ;попробуем в нулевую
-        ; LD HL,.NAMEBUF2+27      ;сюда грузим второй заголовок SNA
+        ; LD D,0              ;Р° РІРѕС‚ С‚СѓС‚ С…РµСЂ Р·РЅР°РµС‚ РІ РєР°РєСѓСЋ
+        ; CALL LOAD4X4        ;РїРѕРїСЂРѕР±СѓРµРј РІ РЅСѓР»РµРІСѓСЋ
+        ; LD HL,.NAMEBUF2+27      ;СЃСЋРґР° РіСЂСѓР·РёРј РІС‚РѕСЂРѕР№ Р·Р°РіРѕР»РѕРІРѕРє SNA
         ; PUSH HL
-        ; LD HL,4            ;заголовок 4 байта
+        ; LD HL,4            ;Р·Р°РіРѕР»РѕРІРѕРє 4 Р±Р°Р№С‚Р°
         ; PUSH HL
-        ; LD HL,.NAMEBUF2+31   ;тут вернётся кол-во
-        ; PUSH HL             ;прочитанных байт
-        ; CALL FATFS.READ     ;читаем
-        ; POP BC,BC,BC        ;снимаем
-        ; LD HL,(.NAMEBUF2+31)   ;кол-во прочитанных байт
-        ; LD A,H              ;проверим на ноль
+        ; LD HL,.NAMEBUF2+31   ;С‚СѓС‚ РІРµСЂРЅС‘С‚СЃСЏ РєРѕР»-РІРѕ
+        ; PUSH HL             ;РїСЂРѕС‡РёС‚Р°РЅРЅС‹С… Р±Р°Р№С‚
+        ; CALL FATFS.READ     ;С‡РёС‚Р°РµРј
+        ; POP BC,BC,BC        ;СЃРЅРёРјР°РµРј
+        ; LD HL,(.NAMEBUF2+31)   ;РєРѕР»-РІРѕ РїСЂРѕС‡РёС‚Р°РЅРЅС‹С… Р±Р°Р№С‚
+        ; LD A,H              ;РїСЂРѕРІРµСЂРёРј РЅР° РЅРѕР»СЊ
         ; OR L
-        ; JR NZ,.L6           ;ЕСЛИ НЕ, ТО ОБРАЗ 128КБ
-        ; LD A,#10            ;7ффд для 48к
+        ; JR NZ,.L6           ;Р•РЎР›Р РќР•, РўРћ РћР‘Р РђР— 128РљР‘
+        ; LD A,#10            ;7С„С„Рґ РґР»СЏ 48Рє
         ; LD (.NAMEBUF2+29),A
         ; XOR A
-        ; LD (SLOTS.III),A        ;сохраняем
-        ; LD (.SNA_L8),A       ;убираем сохранение РС на стеке он там уже есть
-        ; JR .SNA_L7           ;обходим загрузку 128к
-; .L6     LD A,(.NAMEBUF2+29)  ;Смотрим 7ФФД
-        ; AND %111            ;отсекаем лишнее
-        ; LD (SLOTS.III),A        ;сохраняем
-        ; LD D,0              ;Смотрим нужно ли загр.
-        ; CP D                ;нулевую стр.
+        ; LD (SLOTS.III),A        ;СЃРѕС…СЂР°РЅСЏРµРј
+        ; LD (.SNA_L8),A       ;СѓР±РёСЂР°РµРј СЃРѕС…СЂР°РЅРµРЅРёРµ Р РЎ РЅР° СЃС‚РµРєРµ РѕРЅ С‚Р°Рј СѓР¶Рµ РµСЃС‚СЊ
+        ; JR .SNA_L7           ;РѕР±С…РѕРґРёРј Р·Р°РіСЂСѓР·РєСѓ 128Рє
+; .L6     LD A,(.NAMEBUF2+29)  ;РЎРјРѕС‚СЂРёРј 7Р¤Р¤Р”
+        ; AND %111            ;РѕС‚СЃРµРєР°РµРј Р»РёС€РЅРµРµ
+        ; LD (SLOTS.III),A        ;СЃРѕС…СЂР°РЅСЏРµРј
+        ; LD D,0              ;РЎРјРѕС‚СЂРёРј РЅСѓР¶РЅРѕ Р»Рё Р·Р°РіСЂ.
+        ; CP D                ;РЅСѓР»РµРІСѓСЋ СЃС‚СЂ.
         ; JR Z,.SNA_L5
-        ; LD BC,#BFF7         ;Тваю мать, промахнулись
-        ; XOR %1000000        ;нада перекинуть в нужную
-        ; OUT (C),A           ;и загр. нулевую
+        ; LD BC,#BFF7         ;РўРІР°СЋ РјР°С‚СЊ, РїСЂРѕРјР°С…РЅСѓР»РёСЃСЊ
+        ; XOR %1000000        ;РЅР°РґР° РїРµСЂРµРєРёРЅСѓС‚СЊ РІ РЅСѓР¶РЅСѓСЋ
+        ; OUT (C),A           ;Рё Р·Р°РіСЂ. РЅСѓР»РµРІСѓСЋ
         ; LD HL,#4000
         ; LD BC,HL
         ; LD DE,#8000
@@ -577,38 +587,38 @@ fno_sort
         ; POP BC
         ; LD HL,#0205
         ; LD (SLOTS.I),HL
-        ; CALL SET_SLOTS_PAGES    ;расставим стр.
+        ; CALL SET_SLOTS_PAGES    ;СЂР°СЃСЃС‚Р°РІРёРј СЃС‚СЂ.
         ; LD SP,.NAMEBUF2-1
         ; POP AF
         ; LD I,A
-        ; POP HL        ;забираем алтерн. регистры
+        ; POP HL        ;Р·Р°Р±РёСЂР°РµРј Р°Р»С‚РµСЂРЅ. СЂРµРіРёСЃС‚СЂС‹
         ; POP DE
         ; POP BC
         ; POP AF
         ; EXA
         ; EXX
-        ; LD A,(.NAMEBUF2+29)  ;восстановим 7ФФД
+        ; LD A,(.NAMEBUF2+29)  ;РІРѕСЃСЃС‚Р°РЅРѕРІРёРј 7Р¤Р¤Р”
         ; LD BC,#7FFD
         ; OUT (C),A
         ; LD SP,.NAMEBUF2+13
-        ; POP BC              ;забираем регистры
+        ; POP BC              ;Р·Р°Р±РёСЂР°РµРј СЂРµРіРёСЃС‚СЂС‹
         ; POP IY
         ; POP IX
-        ; LD SP,.NAMEBUF2+21   ;забираем АФ
+        ; LD SP,.NAMEBUF2+21   ;Р·Р°Р±РёСЂР°РµРј РђР¤
         ; POP AF
-        ; LD SP,(.NAMEBUF2+23) ;стек
+        ; LD SP,(.NAMEBUF2+23) ;СЃС‚РµРє
         ; LD HL,(.NAMEBUF2+27) ;PC
 ; .SNA_L8
-        ; PUSH HL             ;Закидываем
-        ; PUSH AF             ;добро
-        ; PUSH BC             ;на стек
+        ; PUSH HL             ;Р—Р°РєРёРґС‹РІР°РµРј
+        ; PUSH AF             ;РґРѕР±СЂРѕ
+        ; PUSH BC             ;РЅР° СЃС‚РµРє
         ; LD A,(.NAMEBUF2+19)
         ; CP 0
         ; JR Z,.SNA_L1
         ; LD A,#FB
         ; LD (.ONST_DI),A
 ; .SNA_L1
-        ; LD A,(.NAMEBUF2+25)  ;режим прерываний
+        ; LD A,(.NAMEBUF2+25)  ;СЂРµР¶РёРј РїСЂРµСЂС‹РІР°РЅРёР№
         ; LD B,#46
         ; CP 1
         ; JR C,$+4

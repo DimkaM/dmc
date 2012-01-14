@@ -7,7 +7,7 @@ w		byte		;size
 h		byte
 cx		byte		;позиция печати
 cy		byte
-atr		byte		;атрибут цвета
+atr	byte		;атрибут цвета
 	ends
 	
 	STRUCT MENU
