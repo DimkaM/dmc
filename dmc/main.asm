@@ -71,6 +71,8 @@ INI_CONT
 	include "sample.asm",1
 	endmodule
 	
+	include "viewer.asm"
+
 	module ngs_sd
 	include "ngs_sd.asm",1
 	endmodule
@@ -87,4 +89,4 @@ ENDPROG
 	
 	ORG #8000
 	incbin "aa"
-	SAVEHOB  "proj44.$c","proj44.C",#8000,#8000
+	SAVEHOB  "DMC.$c","DMC.C",#8000,#8000

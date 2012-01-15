@@ -47,6 +47,8 @@ mainloop
 	jp z,about
 	cp 0x32
 	jp z,chdrv
+	cp 0x33
+	jp z,view
 	cp 0x35
 	jp z,copy
 	cp 0x36
