@@ -638,15 +638,13 @@ RD_SECT    PUSH BC
 WR_SECT    PUSH BC
     LD BC,P_DATA
     OUT (C),A
-    LD B,0x7f
+    LD B,0x80
     OTIR
-    LD B,0x7f
+    LD B,0x80
     OTIR
-    LD B,0x7f
+    LD B,0x80
     OTIR
-    LD B,0x7f
-    OTIR
-    LD B,0x04
+    LD B,0x80
     OTIR
     LD A,0xFF
     OUT (C),A

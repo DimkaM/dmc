@@ -41,14 +41,14 @@ mainloop
 	jp z,cursup
 	cp 0x0d
 	jp z,cursent
-	;cp 0x20
-	;jp z,mark
+	cp 0x20
+	jp z,mark
 	cp 0x31
 	jp z,about
 	cp 0x32
 	jp z,chdrv
-	cp 0x33
-	jp z,view
+	;cp 0x33
+	;jp z,view
 	cp 0x35
 	jp z,copy
 	cp 0x36
@@ -61,20 +61,14 @@ mainloop
 	
 mark
 	CALL txt.cursor_v
-	;call getfnocurs
+	call get_fno.name
 	DEC hl
-	ld a,0x10:and (hl):jp nz,mainloop
-	ld de,FILINFO.MARK-FILINFO.FATTRIB
-	add hl,de
-	ld a,(hl):cpl:ld (hl),a
-	ld e,0x20
-	or a:jr z,.l1
-	ld e,'*'
-.l1	ld a,e:ld (.str),a
+	ld a,(hl):cp 0x10:jp z,mainloop
+	xor 0x20:xor 0x2a:ld (hl),a
 	xor a:WIN_SET_CX a
-	PRINTW mark.str
+	ex hl,de
+	call txt.print
 	jp mainloop
-.str byte 0,0
 
 chdrv
 	CALL txt.cursor_v
@@ -165,7 +159,9 @@ mkdir
 	jp cursent.l2
 	
 copy
+	display $
 	CALL txt.cursor_v
+	call calc_mark
 	call get_fno.name
 	ld de,inpstr:ld bc,12:ldir
 	WIN_GET_PAN h,l
@@ -313,7 +309,6 @@ cursdw
 	jp mainloop
 
 cursleft
-	display $
 	CALL txt.cursor_v
 	xor a
 	or (ix+txt.WIN.cy):jr nz,.l1
