@@ -1,4 +1,4 @@
-﻿	INCLUDE "text_h.asm"
+ 	INCLUDE "text_h.asm"
 	INCLUDE "samp_h.asm"
 
 
@@ -244,7 +244,6 @@ delete
 	call get_mark.next
 	jr .l1
 
-.strdel	byte	"Deleting a file, are you sure?",0
 .m_del	byte	"Are you sure to delete "
 .m_del_num	byte "   48 files?",0
 	
