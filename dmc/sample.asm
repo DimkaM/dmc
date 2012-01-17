@@ -159,9 +159,7 @@ mkdir
 	jp cursent.l2
 	
 copy
-	display $
 	CALL txt.cursor_v
-	call calc_mark
 	call get_fno.name
 	ld de,inpstr:ld bc,12:ldir
 	WIN_GET_PAN h,l
@@ -225,17 +223,30 @@ copy
 
 	
 delete
-	ld de,.strdel
+	call calc_mark
+	ld a,b:or c:jr nz,.multi
+	call get_fno.name
+	dec hl:ld a,'*':ld (hl),a
+	ld bc,1
+.multi
+	ld hl,bc:ld de,.m_del_num
+	call txt.strnum.n16
+	ld de,.m_del
 	call txt.asker
 	jp nz,mainloop.l1
-	CALL txt.cursor_v
-	call get_fno.name
-	ex hl,de
 	MEM_FAT
+	call get_mark.start
+.l1
+	or a:jp z,cursent.l2
+	push hl:ex de,hl:inc de
 	F_UNLINK
-	CHK_ERR
-	jp cursent.l2
+	pop hl
+	call get_mark.next
+	jr .l1
+
 .strdel	byte	"Deleting a file, are you sure?",0
+.m_del	byte	"Are you sure to delete "
+.m_del_num	byte "   48 files?",0
 	
 rename
 	CALL txt.cursor_v

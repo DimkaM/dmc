@@ -361,9 +361,9 @@ asker
 .str	byte	13,13," Press 'Y'es('y'es) or any key",0
 
 strnum                     ;перевод числа в десятиричный стринг
-                        ;c=0  a-число  de- куда
-        dec c           ;c=1  hl-число de- куда
-        jr nz,oneb
+.n16                        ;c=0  a-число  de- куда
+        ;dec c           ;c=1  hl-число de- куда
+        ;jr nz,oneb
         ld bc,10000
         call twa
         ld bc,1000
@@ -373,7 +373,7 @@ strnum                     ;перевод числа в десятиричный стринг
         ld a,l
         ex de,hl
         jr onb2-2
-oneb    ex de,hl
+.n8	  ex de,hl
         ld c,47
 onb1    inc c
         sub 100
