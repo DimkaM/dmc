@@ -145,7 +145,7 @@ about
 	pop ix
 	jp mainloop
 .win	txt.WIN 27,8,25,10,0,0,0x30
-.txt	byte "assembly of 17.01.12",13
+.txt	byte "assembly of 18.01.12",13
 	byte " Used sources:",13
 	byte " FatFs library......ChaN",13
 	byte " SD/HDD drivers..Savelij",13
@@ -439,19 +439,19 @@ printerr
 	ret
 .werr	txt.WIN 9,9,60,5,0,0,0x17
 
-readfnos				;de=dir
-	;MEM_UNHIDE
+readfnos
 	ld a,mem.fat_p
 	ld bc,mem.b1
 	out (c),a
-	ld a,(ix+txt.FWIN.pages)
-	ld b,high mem.b2
-	out (c),a
-	;MEM_HIDE
-	
-	ld a,(ix+txt.FWIN.drive):add a,0x30:ld (curdir),a
 	WIN_GETPAGES a
 	ld (.num),a
+	ld b,high mem.b2
+	out (c),a
+	ld de,0xc000
+	ld (ix+txt.FWIN.fno_1),de	
+	ld (ix+txt.FWIN.p_fno_1),a
+	MEM_SET 0x8000,0,0x20
+	ld a,(ix+txt.FWIN.drive):add a,0x30:ld (curdir),a
 	ld de,dir
 	ld bc,curdir
 	F_OPDIR
