@@ -57,7 +57,14 @@ mainloop
 	jp z,mkdir
 	cp 0x38
 	jp z,delete
+	cp 0x7e
+	jp z,ctrl_a
 	jr mainloop.l1
+ctrl_a
+	CALL txt.cursor_v
+	call set_all_mark
+	call pr_flist
+	jp mainloop
 	
 mark
 	CALL txt.cursor_v
@@ -131,7 +138,7 @@ about
 	pop ix
 	jp mainloop
 .win	txt.WIN 27,8,25,10,0,0,0x30
-.txt	byte "assembly of 08.11.11",13
+.txt	byte "assembly of 17.01.12",13
 	byte " Used sources:",13
 	byte " FatFs library......ChaN",13
 	byte " SD/HDD drivers..Savelij",13
@@ -160,34 +167,72 @@ mkdir
 	
 copy
 	CALL txt.cursor_v
-	call get_fno.name
-	ld de,inpstr:ld bc,12:ldir
+	call calc_mark
+	ex hl,de:ld de,.m_del_num
+	call txt.strnum.n16
+	ld de,.m_del
+	call txt.asker
+	jp nz,mainloop.l1
+	
+	WIN_GET_PAN h,l
+	ld de,txt.FWIN.drive:add hl,de
+	ld a,(hl):add 0x30:ld (drvstr),a
+	
+	
+	call get_mark.start
+.l3
+	or a:jp z,.m_end
+	push hl:inc hl
+	call .cpy
+	call txt.progrbar.end
+	pop hl
+	ld a,(.fl):or a:jr nz,.m_end
+	call get_mark.next
+	jr .l3
+	
+.m_end
+	MEM_FAT
 	WIN_GET_PAN h,l
 	push hl:ex (sp),ix
+	call readfnos
+	call pr_flist_new
+	pop ix
+	jp mainloop
+	
+.cpy
+	;call get_fno.name
+	ld de,inpstr:ld bc,12:ldir
+	;WIN_GET_PAN h,l
+	;push hl:ex (sp),ix
 	ld de,inpstr:call txt.progrbar.init
 	MEM_FAT
-	ld e,(ix+txt.FWIN.drive)
-	ld a,0x30:add a,e
-	ld (drvstr),a
+	;ld e,(ix+txt.FWIN.drive)
+	;ld a,0x30:add a,e
+	;ld (drvstr),a
 	MEM_SET .fp1,0,FIL*2
 	F_OPEN .fp1,inpstr,FA_OPEN_EXISTING|FA_READ
-	CHK_ERR_JMP .err1
+	ld (.fl),a
+	CHK_ERR_RET	;CHK_ERR_JMP .err1
 	F_OPEN .fp2,drvstr,FA_CREATE_NEW|FA_WRITE
 	cp 0x08:jr nz,.l2
+	STR_CPY inpstr,.strcpy
 	ld de,.strcpy
 	call txt.asker
-	jp nz,.err1
+	;ld (.fl),a
+	ret nz ;jp nz,.err1
 	MEM_FAT
 	F_OPEN .fp2,drvstr,FA_CREATE_ALWAYS|FA_WRITE
-.l2	CHK_ERR_JMP .err1
+.l2	
+	ld (.fl),a
+	CHK_ERR_RET	;CHK_ERR_JMP .err1
 	MEM_FBUF
 	ld hl,.res:push hl
 .l1	call txt.progrbar.tik
-	;MEM_FAT
 	ld de,.fp1
 	ld bc,0xc000
 	ld hl,0x4000:push hl
 	F_READ
+	ld (.fl),a
 	pop hl
 	CHK_ERR_JR .err
 	ld de,(.res):ld a,e:or d:jr z,.end
@@ -196,6 +241,7 @@ copy
 	ld bc,0xc000
 	F_WRITE
 	pop de
+	ld (.fl),a
 	CHK_ERR_JR .err
 	ld de,(.res1):ld hl,(.res):sbc hl,de
 	jr z,.l1
@@ -208,28 +254,24 @@ copy
 	MEM_FAT
 	F_CLOSE .fp1
 	F_CLOSE .fp2
-.err1
-	MEM_FAT
-	call readfnos
-	call txt.progrbar.end
-	call pr_flist_new
-	pop ix
-	jp mainloop
+	ret
+	
+;.err1
+
 .fp1=MEM_FREE
 .fp2=.fp1+FIL
 .res	dw 0
 .res1	dw 0
-.strcpy	byte	"This file name exists. Overwrite?",0
+.fl byte 0
+.strcpy	byte	"             exists. Overwrite?",0
+.m_del	byte	"Are you sure to copy "
+.m_del_num	byte "   48 files?",0
 
 	
 delete
+	display $
 	call calc_mark
-	ld a,b:or c:jr nz,.multi
-	call get_fno.name
-	dec hl:ld a,'*':ld (hl),a
-	ld bc,1
-.multi
-	ld hl,bc:ld de,.m_del_num
+	ex hl,de:ld de,.m_del_num
 	call txt.strnum.n16
 	ld de,.m_del
 	call txt.asker

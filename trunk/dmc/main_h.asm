@@ -43,6 +43,23 @@
 	LD BC,_SIZE-1:LDIR
 	ENDM
 
+	MACRO MEM_CPY _SRC,_DST,_SIZE
+	ld hl,_SRC
+	ld de,_DST
+	LD BC,_SIZE:LDIR
+	ENDM
+	
+	MACRO STR_CPY _SRC,_DST
+	xor a
+	ld hl,_SRC
+	ld de,_DST
+._STR_CPY_LOOP
+	cp (hl):JR Z,._STR_CPY_END
+	ldi
+	jr ._STR_CPY_LOOP
+._STR_CPY_END
+	ENDM
+	
 	MACRO MEM_SCR
 	call mem.setscr
 	ENDM
