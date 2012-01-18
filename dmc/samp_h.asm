@@ -94,13 +94,20 @@ set_all_mark
 	inc hl:ld a,(hl)
 	jr .l1
 	
-reset_all_mark
-	call get_mark.start
+inv_all_mark
+	ld a,(ix+txt.FWIN.p_fno_1)
+	ld e,(ix+txt.FWIN.fno_1):ld d,(ix+txt.FWIN.fno_1+1)
 .l1
 	or a:ret z
-	call get_mark.next
-	cp 0x10:jr z,.l1
-	ld a,' ':ld (hl),a
+	ld bc,mem.b2:out (c),a
+	ld hl,FILINFO.FATTRIB+0xc000:add hl,de
+	ld a,(hl)
+	cp 0x10:jr z,.l2
+	xor 0x20:xor 0x2a:ld (hl),a
+.l2
+	ld de,FILINFO.NEXT-FILINFO.FATTRIB
+	add hl,de:ld e,(hl):inc hl:ld d,(hl)
+	inc hl:ld a,(hl)
 	jr .l1
 	
 get_mark
