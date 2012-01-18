@@ -60,17 +60,49 @@ pr_flist
 	xor a
 	WIN_SET_AT a,a
 	ret
+	
 calc_mark
-	ld bc,0
-	push bc
+	ld de,0
+	push de
 	call get_mark.start
 .l1
-	pop bc
-	or a:ret z
-	inc bc:push bc
+	pop de
+	or a:jr z,.l2
+	inc de:push de
 	call get_mark.next
 	jr .l1
-
+.l2
+	ld a,d:or e:ret nz
+	call get_fno.name
+	dec hl:ld a,'*':ld (hl),a
+	ld de,1
+	ret
+	
+set_all_mark
+	ld a,(ix+txt.FWIN.p_fno_1)
+	ld e,(ix+txt.FWIN.fno_1):ld d,(ix+txt.FWIN.fno_1+1)
+.l1
+	or a:ret z
+	ld bc,mem.b2:out (c),a
+	ld hl,FILINFO.FATTRIB+0xc000:add hl,de
+	ld a,(hl)
+	cp 0x10:jr z,.l2
+	ld a,'*':ld (hl),a
+.l2
+	ld de,FILINFO.NEXT-FILINFO.FATTRIB
+	add hl,de:ld e,(hl):inc hl:ld d,(hl)
+	inc hl:ld a,(hl)
+	jr .l1
+	
+reset_all_mark
+	call get_mark.start
+.l1
+	or a:ret z
+	call get_mark.next
+	cp 0x10:jr z,.l1
+	ld a,' ':ld (hl),a
+	jr .l1
+	
 get_mark
 .start
 	ld a,(ix+txt.FWIN.p_fno_1)
