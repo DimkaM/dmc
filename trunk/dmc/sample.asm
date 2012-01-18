@@ -29,6 +29,8 @@ mainloop
 	MEM_SCR
 	CALL txt.cursor_v
 .l1	KBD_GET_CHAR
+	cp 0x04
+	jp z,ctrl_i
 	cp 0x06
 	jp z,curstab
 	cp 0x08
@@ -60,10 +62,15 @@ mainloop
 	cp 0x7e
 	jp z,ctrl_a
 	jr mainloop.l1
+	
+ctrl_i
+	call inv_all_mark
+	jp ctrl_a.l1
+	
 ctrl_a
-	CALL txt.cursor_v
+	;CALL txt.cursor_v
 	call set_all_mark
-	call pr_flist
+.l1	call pr_flist
 	jp mainloop
 	
 mark
@@ -166,13 +173,14 @@ mkdir
 	jp cursent.l2
 	
 copy
+	display $
 	CALL txt.cursor_v
 	call calc_mark
 	ex hl,de:ld de,.m_del_num
 	call txt.strnum.n16
 	ld de,.m_del
 	call txt.asker
-	jp nz,mainloop.l1
+	jp nz,mainloop
 	
 	WIN_GET_PAN h,l
 	ld de,txt.FWIN.drive:add hl,de
@@ -197,6 +205,8 @@ copy
 	call readfnos
 	call pr_flist_new
 	pop ix
+	LD a,(IX+txt.FWIN.p_poz)
+	ld bc,mem.b3:out (c),a
 	jp mainloop
 	
 .cpy
@@ -269,7 +279,6 @@ copy
 
 	
 delete
-	display $
 	call calc_mark
 	ex hl,de:ld de,.m_del_num
 	call txt.strnum.n16
