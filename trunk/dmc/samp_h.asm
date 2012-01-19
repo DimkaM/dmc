@@ -62,6 +62,7 @@ pr_flist
 	ret
 	
 calc_mark
+	display $
 	ld de,0
 	push de
 	call get_mark.start
@@ -79,38 +80,36 @@ calc_mark
 	ret
 	
 set_all_mark
-	ld a,(ix+txt.FWIN.p_fno_1)
-	ld e,(ix+txt.FWIN.fno_1):ld d,(ix+txt.FWIN.fno_1+1)
+	call get_fno_nofix.start
 .l1
-	or a:ret z
-	ld bc,mem.b2:out (c),a
-	ld hl,FILINFO.FATTRIB+0xc000:add hl,de
-	ld a,(hl)
+	ret z
 	cp 0x10:jr z,.l2
 	ld a,'*':ld (hl),a
 .l2
-	ld de,FILINFO.NEXT-FILINFO.FATTRIB
-	add hl,de:ld e,(hl):inc hl:ld d,(hl)
-	inc hl:ld a,(hl)
+	call get_fno_nofix.next
 	jr .l1
 	
 inv_all_mark
-	ld a,(ix+txt.FWIN.p_fno_1)
-	ld e,(ix+txt.FWIN.fno_1):ld d,(ix+txt.FWIN.fno_1+1)
+	call get_fno_nofix.start
 .l1
-	or a:ret z
-	ld bc,mem.b2:out (c),a
-	ld hl,FILINFO.FATTRIB+0xc000:add hl,de
-	ld a,(hl)
+	ret z
 	cp 0x10:jr z,.l2
 	xor 0x20:xor 0x2a:ld (hl),a
 .l2
-	ld de,FILINFO.NEXT-FILINFO.FATTRIB
-	add hl,de:ld e,(hl):inc hl:ld d,(hl)
-	inc hl:ld a,(hl)
+	call get_fno_nofix.next
 	jr .l1
 	
 get_mark
+.start
+	call get_fno_nofix.start
+.l1
+	ret z
+	ld a,(hl):cp '*':ret z
+.next
+	call get_fno_nofix.next
+	jr .l1
+		
+get_fno_nofix
 .start
 	ld a,(ix+txt.FWIN.p_fno_1)
 	ld e,(ix+txt.FWIN.fno_1):ld d,(ix+txt.FWIN.fno_1+1)
@@ -118,13 +117,14 @@ get_mark
 	or a:ret z
 	ld bc,mem.b2:out (c),a
 	ld hl,FILINFO.FATTRIB+0xc000:add hl,de
-	ld a,(hl):cp '*':ret z
+	ld a,(hl)
+	ret
 .next
 	ld de,FILINFO.NEXT-FILINFO.FATTRIB
 	add hl,de:ld e,(hl):inc hl:ld d,(hl)
 	inc hl:ld a,(hl)
 	jr .l1
-	
+		
 get_fno
 .name
 	ld a,FILINFO.FNAME

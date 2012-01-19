@@ -62,7 +62,14 @@ mainloop
 	cp 0x7e
 	jp z,ctrl_a
 	jr mainloop.l1
+	cp 'a'
+	jr c,mainloop.l1
+	cp 'z'+1
+	jr nc,mainloop.l1
+
+alfavit
 	
+
 ctrl_i
 	call inv_all_mark
 	jp ctrl_a.l1
@@ -173,7 +180,6 @@ mkdir
 	jp cursent.l2
 	
 copy
-	display $
 	CALL txt.cursor_v
 	call calc_mark
 	ex hl,de:ld de,.m_del_num
@@ -458,27 +464,24 @@ readfnos
 .l2	ld bc,0x8000
 .l1	ld de,dir
 	F_RDIR
+	push bc:pop iy
 	ld a,FILINFO.FNAME:add c:ld c,a
-	LD A,(BC)
-	or a
-	ret z
-	dec c:ld a,(bc):and 0x10:jr nz,.cat
+	LD A,(BC):or a:ret z
+	dec c
+	sub 0x2e:or (iy+FILINFO.FNAME+1)
+	jr z,.l2		;пропускаем точку
+	ld a,(bc):and 0x10:jr nz,.cat
 	ld a,0x20
 .cat	ld (bc),a
 	ld d,b,e,c
 	push bc
-	;MEM_UNHIDE
-	ld iy,0xfff8:add iy,bc ;-8+bc
 	call fno_sort
-	;MEM_HIDE
 	pop bc
 	ADDBC8 0x18
 	bit 6,b:jr z,.l1
 	ld hl,.num:inc (hl)
-	;MEM_UNHIDE
 	ld bc,mem.b2:ld a,(hl)
 	out (c),a
-	;MEM_HIDE
 	ld bc,0x8000
 	jr .l1
 .num	word 0
